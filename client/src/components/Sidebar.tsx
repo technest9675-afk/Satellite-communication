@@ -1,8 +1,96 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Contact, CurrentUser, SatelliteModuleState } from '../types';
 import { sounds } from '../services/soundEffects';
 import { NexusLogo } from './NexusLogo';
 import { useTranslation } from '../services/i18n';
+
+interface ContactListItemProps {
+  contact: Contact;
+  isActive: boolean;
+  onSelect: (id: string) => void;
+  onOpenInfo?: (contact: Contact) => void;
+}
+
+const ContactListItem = React.memo<ContactListItemProps>(({
+  contact,
+  isActive,
+  onSelect,
+  onOpenInfo,
+}) => {
+  return (
+    <div
+      onClick={() => onSelect(contact.id)}
+      className={`px-4 py-3 flex items-center gap-3 cursor-pointer transition-colors relative min-h-[64px] ${
+        isActive
+          ? 'bg-surface-container-high/90 border-l-4 border-primary'
+          : 'hover:bg-surface-container-low/70'
+      }`}
+    >
+      {/* Avatar with Online or Satellite Beacon - Clicking Opens WhatsApp-Style Info Screen */}
+      <div
+        className="relative shrink-0 cursor-pointer active:scale-95 transition-transform"
+        onClick={(e) => {
+          e.stopPropagation();
+          if (onOpenInfo) onOpenInfo(contact);
+        }}
+        title={contact.isGroup ? 'View Group Info' : 'View Contact Info'}
+      >
+        <img
+          src={contact.avatar}
+          alt={contact.name}
+          loading="lazy"
+          decoding="async"
+          className="w-12 h-12 rounded-full object-cover ring-1 ring-surface-container-highest hover:ring-2 hover:ring-primary/60 transition-all"
+        />
+        {contact.online ? (
+          <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-primary ring-2 ring-surface" />
+        ) : contact.satelliteLinked ? (
+          <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-secondary ring-2 ring-surface flex items-center justify-center">
+            <span className="material-symbols-outlined text-[8px] text-black">satellite_alt</span>
+          </span>
+        ) : null}
+      </div>
+
+      {/* Details */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-1 mb-0.5">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="font-semibold text-sm text-on-surface truncate">
+              {contact.name}
+            </span>
+            {contact.verifiedBharat && (
+              <span className="material-symbols-outlined text-[15px] text-primary shrink-0" title="Verified Sovereign Node">
+                verified
+              </span>
+            )}
+          </div>
+          <span className="font-mono text-[10px] text-outline shrink-0">
+            {contact.lastMessageTime || ''}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-xs text-on-surface-variant truncate font-sans">
+            {contact.lastMessage || 'No messages yet'}
+          </p>
+
+          <div className="flex items-center gap-1 shrink-0">
+            {contact.satelliteLinked && (
+              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-secondary/10 text-secondary border border-secondary/20">
+                SAT
+              </span>
+            )}
+            {(contact.unreadCount || 0) > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full bg-primary text-on-primary text-[10px] font-mono font-bold">
+                {contact.unreadCount}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
 
 interface SidebarProps {
   contacts: Contact[];
@@ -22,7 +110,7 @@ interface SidebarProps {
   onToggleSound: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({
+export const Sidebar: React.FC<SidebarProps> = React.memo(({
   contacts,
   activeContactId,
   onSelectContact,
@@ -45,20 +133,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [activeFilter, setActiveFilter] = useState<'all' | 'direct' | 'satellite' | 'dispatches'>('all');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const filteredContacts = contacts.filter((c) => {
-    const matchesSearch =
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.lastMessage.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (c.nexusId && c.nexusId.toLowerCase().includes(searchTerm.toLowerCase()));
-    if (!matchesSearch) return false;
+  const directCount = useMemo(() => contacts.filter((c) => !c.isGroup).length, [contacts]);
+  const satCount = useMemo(() => contacts.filter((c) => c.satelliteLinked).length, [contacts]);
+  const groupCount = useMemo(() => contacts.filter((c) => c.isGroup).length, [contacts]);
 
-    if (activeFilter === 'direct') return !c.isGroup;
-    if (activeFilter === 'satellite') return c.satelliteLinked;
-    if (activeFilter === 'dispatches') return c.isGroup;
-    return true;
-  });
+  const filteredContacts = useMemo(() => {
+    const term = searchTerm.toLowerCase().trim();
+    return contacts.filter((c) => {
+      if (term) {
+        const matchesSearch =
+          c.name.toLowerCase().includes(term) ||
+          c.lastMessage.toLowerCase().includes(term) ||
+          (c.nexusId && c.nexusId.toLowerCase().includes(term));
+        if (!matchesSearch) return false;
+      }
 
-  const totalUnread = contacts.reduce((sum, c) => sum + (c.unreadCount || 0), 0);
+      if (activeFilter === 'direct') return !c.isGroup;
+      if (activeFilter === 'satellite') return c.satelliteLinked;
+      if (activeFilter === 'dispatches') return c.isGroup;
+      return true;
+    });
+  }, [contacts, searchTerm, activeFilter]);
+
+  const totalUnread = useMemo(() => contacts.reduce((sum, c) => sum + (c.unreadCount || 0), 0), [contacts]);
   const isSatConnected = satelliteState?.hardwareConnected ?? true;
   const batteryPct = satelliteState?.battery ?? 94;
   const isAdmin = currentUser?.role === 'admin';
@@ -282,9 +379,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="px-4 pb-2.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
           {[
             { id: 'all', label: t('filter_all_chats', 'All Chats'), count: contacts.length },
-            { id: 'direct', label: t('filter_direct', 'Direct'), count: contacts.filter((c) => !c.isGroup).length },
-            { id: 'satellite', label: t('filter_satellite', 'Satellite'), count: contacts.filter((c) => c.satelliteLinked).length },
-            { id: 'dispatches', label: t('filter_groups', 'Groups'), count: contacts.filter((c) => c.isGroup).length }
+            { id: 'direct', label: t('filter_direct', 'Direct'), count: directCount },
+            { id: 'satellite', label: t('filter_satellite', 'Satellite'), count: satCount },
+            { id: 'dispatches', label: t('filter_groups', 'Groups'), count: groupCount }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -326,81 +423,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
         ) : (
-          filteredContacts.map((contact) => {
-            const isActive = contact.id === activeContactId;
-            return (
-              <div
-                key={contact.id}
-                onClick={() => onSelectContact(contact.id)}
-                className={`px-4 py-3 flex items-center gap-3 cursor-pointer transition-colors relative min-h-[64px] ${
-                  isActive
-                    ? 'bg-surface-container-high/90 border-l-4 border-primary'
-                    : 'hover:bg-surface-container-low/70'
-                }`}
-              >
-                {/* Avatar with Online or Satellite Beacon - Clicking Opens WhatsApp-Style Info Screen */}
-                <div
-                  className="relative shrink-0 cursor-pointer active:scale-95 transition-transform"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (onOpenContactInfo) onOpenContactInfo(contact);
-                  }}
-                  title={contact.isGroup ? 'View Group Info' : 'View Contact Info'}
-                >
-                  <img
-                    src={contact.avatar}
-                    alt={contact.name}
-                    className="w-12 h-12 rounded-full object-cover ring-1 ring-surface-container-highest hover:ring-2 hover:ring-primary/60 transition-all"
-                  />
-                  {contact.online ? (
-                    <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-primary ring-2 ring-surface" />
-                  ) : contact.satelliteLinked ? (
-                    <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-secondary ring-2 ring-surface flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[8px] text-black">satellite_alt</span>
-                    </span>
-                  ) : null}
-                </div>
-
-                {/* Details */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-1 mb-0.5">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="font-semibold text-sm text-on-surface truncate">
-                        {contact.name}
-                      </span>
-                      {contact.verifiedBharat && (
-                        <span className="material-symbols-outlined text-[15px] text-primary shrink-0" title="Verified Sovereign Node">
-                          verified
-                        </span>
-                      )}
-                    </div>
-                    <span className="font-mono text-[10px] text-outline shrink-0">
-                      {contact.lastMessageTime || ''}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs text-on-surface-variant truncate font-sans">
-                      {contact.lastMessage || 'No messages yet'}
-                    </p>
-
-                    <div className="flex items-center gap-1 shrink-0">
-                      {contact.satelliteLinked && (
-                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-secondary/10 text-secondary border border-secondary/20">
-                          SAT
-                        </span>
-                      )}
-                      {(contact.unreadCount || 0) > 0 && (
-                        <span className="px-1.5 py-0.5 rounded-full bg-primary text-on-primary text-[10px] font-mono font-bold">
-                          {contact.unreadCount}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })
+          filteredContacts.map((contact) => (
+            <ContactListItem
+              key={contact.id}
+              contact={contact}
+              isActive={contact.id === activeContactId}
+              onSelect={onSelectContact}
+              onOpenInfo={onOpenContactInfo}
+            />
+          ))
         )}
       </main>
 
@@ -416,4 +447,4 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </button>
     </div>
   );
-};
+});

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Contact, Message, CurrentUser, SatelliteModuleState, MessageMode } from '../types';
 import { sounds } from '../services/soundEffects';
 
@@ -30,7 +30,156 @@ interface ChatWindowProps {
   isMobileChassis?: boolean;
 }
 
-export const ChatWindow: React.FC<ChatWindowProps> = ({
+// Static Indic phrase chips moved outside component to avoid recreation
+const INDIC_SUGGESTIONS: Record<string, string[]> = {
+  en: ['Are you safe?', 'Heading to Base Camp', 'Satellite link OK', 'Send coordinates'],
+  hi: ['क्या आप सुरक्षित हैं?', 'बेस कैंप जा रहे हैं', 'सैटेलाइट लिंक तैयार', 'लोकेशन भेजें'],
+  ta: ['நீங்கள் நலமா?', 'முகாமிற்கு செல்கிறோம்', 'செயற்கைக்கோள் தயார்', 'இருப்பிடம் அனுப்பவும்'],
+  te: ['మీరు సురక్షితంగా ఉన్నారా?', 'బేస్ క్యాంప్‌కు వెళ్తున్నాం', 'శాటిలైట్ లింక్ సిద్ధం', 'లొకేషన్ పంపండి']
+};
+
+const StatusIndicator: React.FC<{ status?: string }> = React.memo(({ status }) => {
+  switch (status) {
+    case 'sending':
+      return (
+        <span className="material-symbols-outlined text-[13px] text-outline animate-spin" title="Sending...">
+          progress_activity
+        </span>
+      );
+    case 'sent':
+      return (
+        <span className="material-symbols-outlined text-[14px] text-outline" title="Sent">
+          check
+        </span>
+      );
+    case 'delivered':
+      return (
+        <span className="material-symbols-outlined text-[14px] text-on-surface-variant" title="Delivered">
+          done_all
+        </span>
+      );
+    case 'satellite_uplinked':
+      return (
+        <span className="material-symbols-outlined text-[13px] text-secondary" title="Satellite Uplinked">
+          satellite_alt
+        </span>
+      );
+    case 'read':
+    default:
+      return (
+        <span
+          className="material-symbols-outlined text-[14px] leading-none text-primary"
+          style={{ fontVariationSettings: "'FILL' 1" }}
+          title="Read"
+        >
+          done_all
+        </span>
+      );
+  }
+});
+
+interface MessageBubbleProps {
+  msg: Message;
+  isMe: boolean;
+  isPlayingAudio: boolean;
+  onToggleAudioPlay: (id: string) => void;
+}
+
+// Isolated memoized message bubble - prevents re-rendering on input typing
+const MessageBubble = React.memo<MessageBubbleProps>(({
+  msg,
+  isMe,
+  isPlayingAudio,
+  onToggleAudioPlay
+}) => {
+  const isVoice = msg.type === 'voice';
+  const isLocation = msg.type === 'location';
+
+  return (
+    <div
+      className={`flex flex-col max-w-[88%] sm:max-w-[72%] ${
+        isMe ? 'items-end self-end' : 'items-start self-start'
+      }`}
+    >
+      <div
+        className={`rounded-2xl p-3 shadow-sm flex flex-col gap-1.5 border ${
+          isMe
+            ? 'rounded-tr-sm bg-emerald-50 dark:bg-primary/15 border-emerald-200 dark:border-primary/25 text-on-surface'
+            : 'rounded-tl-sm bg-white dark:bg-surface-container border-slate-200/90 dark:border-surface-container-high text-on-surface'
+        }`}
+      >
+        {/* Voice Note Player */}
+        {isVoice ? (
+          <div className="space-y-1">
+            <p className="text-xs leading-relaxed text-on-surface">
+              {msg.text}
+            </p>
+            <div className="flex items-center gap-2.5 p-2 rounded-xl bg-surface-container-lowest border border-surface-container-highest/60">
+              <button
+                type="button"
+                aria-label="Play Audio"
+                onClick={() => onToggleAudioPlay(msg.id)}
+                className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary shrink-0 shadow active:scale-90 transition-transform"
+              >
+                <span className="material-symbols-outlined text-base leading-none" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  {isPlayingAudio ? 'pause' : 'play_arrow'}
+                </span>
+              </button>
+              <div className="flex-1 flex items-center gap-1 h-5">
+                {[4, 8, 14, 6, 12, 16, 10, 14, 8, 12, 6, 10].map((h, i) => (
+                  <div
+                    key={i}
+                    className={`w-1 rounded-full transition-all ${
+                      isPlayingAudio ? 'bg-primary animate-pulse' : 'bg-outline'
+                    }`}
+                    style={{ height: `${h}px` }}
+                  />
+                ))}
+              </div>
+              <span className="font-mono text-[11px] text-outline font-medium">0:04</span>
+            </div>
+          </div>
+        ) : isLocation ? (
+          <div className="space-y-1">
+            <p className="text-xs leading-relaxed text-on-surface">
+              {msg.text}
+            </p>
+            <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-surface-container-low border border-surface-container-highest/60">
+              <div className="w-9 h-9 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
+                <span className="material-symbols-outlined text-lg text-primary">location_on</span>
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs font-semibold text-on-surface">
+                  {msg.locationData?.address || 'Tactical GPS Location'}
+                </span>
+                <span className="text-[11px] text-outline truncate">
+                  {msg.locationData?.lat ? `${msg.locationData.lat.toFixed(4)}° N, ${msg.locationData.lng.toFixed(4)}° E` : 'Encrypted Coordinates'}
+                </span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p className="text-xs leading-relaxed text-on-surface whitespace-pre-wrap">
+            {msg.text}
+          </p>
+        )}
+
+        {/* Bubble Timestamp & Status */}
+        <div className="flex items-center justify-end gap-1.5 pt-0.5 self-end">
+          {msg.mode === 'satellite' && (
+            <span className="text-[9px] font-mono font-semibold text-secondary mr-0.5">SAT</span>
+          )}
+          <span className="font-mono text-[10px] text-outline">
+            {msg.timestamp || 'Just now'}
+          </span>
+          {isMe && <StatusIndicator status={msg.status} />}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+export const ChatWindow: React.FC<ChatWindowProps> = React.memo(({
   contact,
   messages,
   currentUser,
@@ -51,14 +200,44 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const [isAttachOpen, setIsAttachOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'hi' | 'ta' | 'te'>('en');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLElement>(null);
+  const prevContactIdRef = useRef<string | null>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
+  // Jump to bottom immediately on contact switch
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (contact?.id && contact.id !== prevContactIdRef.current) {
+      prevContactIdRef.current = contact.id;
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+    }
+  }, [contact?.id]);
+
+  // Smart auto-scroll: Only scroll if message is from currentUser or user is already near bottom
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+      return;
+    }
+
+    const lastMsg = messages[messages.length - 1];
+    const isMe = lastMsg && lastMsg.senderId === currentUser?.id;
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 160;
+
+    if (isMe || isNearBottom) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+    }
+  }, [messages, currentUser?.id]);
+
+  const toggleAudioPlay = useCallback((msgId: string) => {
+    setIsPlayingAudio((prev) => {
+      if (prev === msgId) return null;
+      sounds.playRadioSquelch();
+      setTimeout(() => {
+        setIsPlayingAudio((current) => (current === msgId ? null : current));
+      }, 4000);
+      return msgId;
+    });
+  }, []);
 
   if (!contact) {
     return (
@@ -117,66 +296,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     setIsAttachOpen(false);
   };
 
-  const toggleAudioPlay = (msgId: string) => {
-    if (isPlayingAudio === msgId) {
-      setIsPlayingAudio(null);
-    } else {
-      setIsPlayingAudio(msgId);
-      sounds.playRadioSquelch();
-      setTimeout(() => {
-        setIsPlayingAudio(null);
-      }, 4000);
-    }
-  };
-
-  // Indic phrase chips
-  const indicSuggestions: Record<string, string[]> = {
-    en: ['Are you safe?', 'Heading to Base Camp', 'Satellite link OK', 'Send coordinates'],
-    hi: ['क्या आप सुरक्षित हैं?', 'बेस कैंप जा रहे हैं', 'सैटेलाइट लिंक तैयार', 'लोकेशन भेजें'],
-    ta: ['நீங்கள் நலமா?', 'முகாமிற்கு செல்கிறோம்', 'செயற்கைக்கோள் தயார்', 'இருப்பிடம் அனுப்பவும்'],
-    te: ['మీరు సురక్షితంగా ఉన్నారా?', 'బేస్ క్యాంప్‌కు వెళ్తున్నాం', 'శాటిలైట్ లింక్ సిద్ధం', 'లొకేషన్ పంపండి']
-  };
-
-  const renderStatusIndicator = (status?: string) => {
-    switch (status) {
-      case 'sending':
-        return (
-          <span className="material-symbols-outlined text-[13px] text-outline animate-spin" title="Sending...">
-            progress_activity
-          </span>
-        );
-      case 'sent':
-        return (
-          <span className="material-symbols-outlined text-[14px] text-outline" title="Sent">
-            check
-          </span>
-        );
-      case 'delivered':
-        return (
-          <span className="material-symbols-outlined text-[14px] text-on-surface-variant" title="Delivered">
-            done_all
-          </span>
-        );
-      case 'satellite_uplinked':
-        return (
-          <span className="material-symbols-outlined text-[13px] text-secondary" title="Satellite Uplinked">
-            satellite_alt
-          </span>
-        );
-      case 'read':
-      default:
-        return (
-          <span
-            className="material-symbols-outlined text-[14px] leading-none text-primary"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-            title="Read"
-          >
-            done_all
-          </span>
-        );
-    }
-  };
-
   return (
     <div className="flex-1 h-full flex flex-col bg-surface select-none relative overflow-hidden">
       {/* HEADER */}
@@ -201,6 +320,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             >
               <img
                 alt={contact.name}
+                loading="lazy"
+                decoding="async"
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover shadow-sm ring-1 ring-primary/30 hover:ring-2 hover:ring-primary/60 transition-all"
                 src={contact.avatar}
               />
@@ -266,14 +387,15 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             >
               <span className="material-symbols-outlined text-lg sm:text-xl text-secondary">radio</span>
             </button>
-
-
           </div>
         </div>
       </header>
 
       {/* CHAT TRANSCRIPT STREAM */}
-      <main className="flex-1 overflow-y-auto px-3 sm:px-4 py-3 flex flex-col gap-3 no-scrollbar">
+      <main
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto px-3 sm:px-4 py-3 flex flex-col gap-3 no-scrollbar"
+      >
         {/* Real E2EE Security Notice */}
         <div className="flex justify-center w-full my-1">
           <div className="max-w-xs px-3 py-1 rounded-lg bg-surface-container-low/90 text-center flex items-center justify-center gap-1.5 shadow-sm border border-surface-container-high/60">
@@ -284,96 +406,16 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           </div>
         </div>
 
-        {/* Messages Loop */}
-        {messages.map((msg) => {
-          const isMe = msg.senderId === currentUser?.id;
-          const isVoice = msg.type === 'voice';
-          const isLocation = msg.type === 'location';
-
-          return (
-            <div
-              key={msg.id}
-              className={`flex flex-col max-w-[88%] sm:max-w-[72%] ${
-                isMe ? 'items-end self-end' : 'items-start self-start'
-              }`}
-            >
-              <div
-                className={`rounded-2xl p-3 shadow-sm flex flex-col gap-1.5 border ${
-                  isMe
-                    ? 'rounded-tr-sm bg-emerald-50 dark:bg-primary/15 border-emerald-200 dark:border-primary/25 text-on-surface'
-                    : 'rounded-tl-sm bg-white dark:bg-surface-container border-slate-200/90 dark:border-surface-container-high text-on-surface'
-                }`}
-              >
-                {/* Voice Note Player */}
-                {isVoice ? (
-                  <div className="space-y-1">
-                    <p className="text-xs leading-relaxed text-on-surface">
-                      {msg.text}
-                    </p>
-                    <div className="flex items-center gap-2.5 p-2 rounded-xl bg-surface-container-lowest border border-surface-container-highest/60">
-                      <button
-                        type="button"
-                        aria-label="Play Audio"
-                        onClick={() => toggleAudioPlay(msg.id)}
-                        className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary shrink-0 shadow active:scale-90 transition-transform"
-                      >
-                        <span className="material-symbols-outlined text-base leading-none" style={{ fontVariationSettings: "'FILL' 1" }}>
-                          {isPlayingAudio === msg.id ? 'pause' : 'play_arrow'}
-                        </span>
-                      </button>
-                      <div className="flex-1 flex items-center gap-1 h-5">
-                        {[4, 8, 14, 6, 12, 16, 10, 14, 8, 12, 6, 10].map((h, i) => (
-                          <div
-                            key={i}
-                            className={`w-1 rounded-full transition-all ${
-                              isPlayingAudio === msg.id ? 'bg-primary animate-pulse' : 'bg-outline'
-                            }`}
-                            style={{ height: `${h}px` }}
-                          />
-                        ))}
-                      </div>
-                      <span className="font-mono text-[11px] text-outline font-medium">0:04</span>
-                    </div>
-                  </div>
-                ) : isLocation ? (
-                  <div className="space-y-1">
-                    <p className="text-xs leading-relaxed text-on-surface">
-                      {msg.text}
-                    </p>
-                    <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-surface-container-low border border-surface-container-highest/60">
-                      <div className="w-9 h-9 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
-                        <span className="material-symbols-outlined text-lg text-primary">location_on</span>
-                      </div>
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-xs font-semibold text-on-surface">
-                          {msg.locationData?.address || 'Tactical GPS Location'}
-                        </span>
-                        <span className="text-[11px] text-outline truncate">
-                          {msg.locationData?.lat ? `${msg.locationData.lat.toFixed(4)}° N, ${msg.locationData.lng.toFixed(4)}° E` : 'Encrypted Coordinates'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-xs leading-relaxed text-on-surface whitespace-pre-wrap">
-                    {msg.text}
-                  </p>
-                )}
-
-                {/* Bubble Timestamp & Status */}
-                <div className="flex items-center justify-end gap-1.5 pt-0.5 self-end">
-                  {msg.mode === 'satellite' && (
-                    <span className="text-[9px] font-mono font-semibold text-secondary mr-0.5">SAT</span>
-                  )}
-                  <span className="font-mono text-[10px] text-outline">
-                    {msg.timestamp || 'Just now'}
-                  </span>
-                  {isMe && renderStatusIndicator(msg.status)}
-                </div>
-              </div>
-            </div>
-          );
-        })}
+        {/* Messages Loop with Memoized Bubbles */}
+        {messages.map((msg) => (
+          <MessageBubble
+            key={msg.id}
+            msg={msg}
+            isMe={msg.senderId === currentUser?.id}
+            isPlayingAudio={isPlayingAudio === msg.id}
+            onToggleAudioPlay={toggleAudioPlay}
+          />
+        ))}
         <div ref={messagesEndRef} />
       </main>
 
@@ -396,7 +438,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           ))}
         </div>
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-          {indicSuggestions[selectedLanguage].map((phrase, i) => (
+          {INDIC_SUGGESTIONS[selectedLanguage].map((phrase, i) => (
             <button
               key={i}
               type="button"
@@ -447,45 +489,28 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                     <span className="material-symbols-outlined text-base text-secondary">location_on</span>
                     <span>Share Location</span>
                   </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsAttachOpen(false);
-                      handleSendVoiceNote();
-                    }}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-on-surface hover:bg-surface-container-highest transition text-left"
-                  >
-                    <span className="material-symbols-outlined text-base text-tertiary">mic</span>
-                    <span>Send Voice Note</span>
-                  </button>
                 </div>
               </>
             )}
           </div>
 
-          {/* Text Input */}
-          <div className="flex-1 relative flex items-center">
+          {/* Text Input with Instant Response */}
+          <div className="flex-1 relative">
             <input
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder={isSatMode ? 'Burst text via NavIC Satellite...' : 'Type encrypted message...'}
-              className="w-full h-11 bg-surface-container rounded-full pl-4 pr-10 text-xs sm:text-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-high border border-surface-container-highest/60 transition-all"
+              placeholder={isSatMode ? 'Satellite uplink ready...' : 'Sovereign encrypted message...'}
+              className="w-full h-10 bg-surface-container-low rounded-full px-4 text-xs sm:text-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container border border-surface-container-highest/80 transition-all font-sans"
             />
-            {isSatMode && (
-              <span className="absolute right-3 text-[10px] font-mono text-secondary uppercase font-semibold">
-                SAT
-              </span>
-            )}
           </div>
 
-          {/* Voice or Send CTA */}
+          {/* Send or Mic */}
           {inputText.trim() ? (
             <button
               type="submit"
-              className="w-10 h-10 rounded-full bg-primary hover:bg-primary-fixed text-on-primary flex items-center justify-center shadow-[0_0_12px_rgba(0,229,163,0.3)] active:scale-90 transition-transform shrink-0"
-              title="Send Message"
+              className="w-10 h-10 rounded-full bg-primary hover:bg-primary-fixed text-on-primary flex items-center justify-center transition-all shadow-md active:scale-95 shrink-0"
+              title="Send Encrypted Message"
             >
               <span className="material-symbols-outlined text-[20px]">send</span>
             </button>
@@ -503,4 +528,4 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       </footer>
     </div>
   );
-};
+});

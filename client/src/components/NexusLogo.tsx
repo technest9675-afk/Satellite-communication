@@ -1,87 +1,70 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface NexusLogoProps {
   className?: string;
   size?: number;
   glow?: boolean;
+  variant?: 'emblem' | 'full';
 }
 
 export const NexusLogo: React.FC<NexusLogoProps> = ({
-  className = 'w-8 h-8',
+  className = '',
   size = 32,
-  glow = false
+  glow = false,
+  variant = 'emblem'
 }) => {
+  const [hasError, setHasError] = useState(false);
+
+  if (variant === 'full') {
+    return (
+      <div
+        className={`relative inline-flex items-center justify-center shrink-0 ${
+          glow ? 'drop-shadow-[0_0_16px_rgba(0,180,255,0.45)]' : ''
+        } ${className}`}
+      >
+        <img
+          src="/nexus-brand-card.png"
+          alt="NEXUS - Stay Connected. Anywhere."
+          className="w-full h-auto object-contain select-none pointer-events-none rounded-xl"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+    );
+  }
+
   return (
     <div
-      className={`relative inline-flex items-center justify-center shrink-0 ${className}`}
+      className={`relative inline-flex items-center justify-center shrink-0 rounded-full overflow-hidden bg-[#040812] ${
+        glow ? 'shadow-[0_0_14px_rgba(0,180,255,0.55)] ring-1 ring-sky-500/40' : 'ring-1 ring-white/10'
+      } ${className}`}
       style={{ width: size, height: size }}
     >
-      <svg
-        viewBox="0 0 100 100"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className={`w-full h-full ${glow ? 'drop-shadow-[0_0_8px_rgba(0,229,163,0.6)]' : ''}`}
-      >
-        <defs>
-          <linearGradient id="nexusGradient" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#00E5A3" />
-            <stop offset="50%" stopColor="#00C48C" />
-            <stop offset="100%" stopColor="#008BFF" />
-          </linearGradient>
-          <linearGradient id="nexusRingGradient" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#00E5A3" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#008BFF" stopOpacity="0.2" />
-          </linearGradient>
-        </defs>
-
-        {/* Outer Hexagonal Sovereign Orbital Shield */}
-        <path
-          d="M50 8 L86 29 L86 71 L50 92 L14 71 L14 29 Z"
-          stroke="url(#nexusRingGradient)"
-          strokeWidth="4"
-          strokeLinejoin="round"
-          fill="#0c1624"
+      {!hasError ? (
+        <img
+          src="/nexus-logo-emblem.png"
+          alt="NEXUS"
+          onError={() => setHasError(true)}
+          className="w-full h-full object-cover rounded-full select-none pointer-events-none transform scale-[1.05]"
+          loading="eager"
+          decoding="async"
         />
-
-        {/* Inner Geometric "N" Nexus Core */}
-        {/* Left Pillar */}
-        <path
-          d="M32 30 L32 70"
-          stroke="url(#nexusGradient)"
-          strokeWidth="8"
-          strokeLinecap="round"
-        />
-
-        {/* Diagonal Crosslink */}
-        <path
-          d="M32 30 L68 70"
-          stroke="url(#nexusGradient)"
-          strokeWidth="7"
-          strokeLinecap="round"
-        />
-
-        {/* Right Pillar */}
-        <path
-          d="M68 30 L68 70"
-          stroke="url(#nexusGradient)"
-          strokeWidth="8"
-          strokeLinecap="round"
-        />
-
-        {/* Center Orbital Node Core */}
-        <circle cx="50" cy="50" r="5" fill="#FFFFFF" />
-        <circle cx="50" cy="50" r="8" stroke="#00E5A3" strokeWidth="2" strokeDasharray="2 2" />
-
-        {/* Corner Telemetry Vertex Dots */}
-        <circle cx="50" cy="8" r="3" fill="#00E5A3" />
-        <circle cx="86" cy="29" r="3" fill="#00E5A3" />
-        <circle cx="86" cy="71" r="3" fill="#008BFF" />
-        <circle cx="50" cy="92" r="3" fill="#008BFF" />
-        <circle cx="14" cy="71" r="3" fill="#00E5A3" />
-        <circle cx="14" cy="29" r="3" fill="#00E5A3" />
-      </svg>
+      ) : (
+        /* Vector Fallback */
+        <svg
+          viewBox="0 0 100 100"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full h-full p-1"
+        >
+          <circle cx="50" cy="50" r="42" stroke="#00B4FF" strokeWidth="3" />
+          <path d="M30 75 L30 25 L45 25 L70 65 L70 25" stroke="#FFFFFF" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M22 78 C 35 60, 55 45, 78 22" stroke="#00E5A3" strokeWidth="5" strokeLinecap="round" />
+        </svg>
+      )}
     </div>
   );
 };
 
 export default NexusLogo;
+

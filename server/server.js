@@ -2235,9 +2235,16 @@ io.on('connection', (socket) => {
     };
     socket.broadcast.emit('incoming_call_signal', stamped);
   });
+
+  socket.on('disconnect', () => {
+    // Socket.io automatically leaves all rooms upon disconnection
+  });
 });
 
 setInterval(() => {
+  // Only broadcast telemetry if there are connected clients
+  if (!io.engine || io.engine.clientsCount === 0) return;
+
   const delta = (Math.random() - 0.5) * 0.4;
   const newSnr = Math.min(38, Math.max(22, 31.4 + delta)).toFixed(1);
   io.emit('satellite_telemetry_tick', {
@@ -2254,11 +2261,21 @@ setInterval(() => {
 }, 6000);
 
 // -------------------------------------------------------------
-// SERVE CLIENT PRODUCTION BUILD
+// SERVE CLIENT PRODUCTION BUILD (With High-Performance Caching)
 // -------------------------------------------------------------
 const CLIENT_DIST = path.join(__dirname, '../client/dist');
 if (fs.existsSync(CLIENT_DIST)) {
-  app.use(express.static(CLIENT_DIST));
+  app.use(express.static(CLIENT_DIST, {
+    maxAge: '1y',
+    immutable: true,
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    }
+  }));
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
       return next();

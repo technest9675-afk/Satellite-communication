@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { CurrentUser } from '../types';
 import { requestOtpApi, verifyOtpApi, loginDemoApi } from '../services/api';
 import { sounds } from '../services/soundEffects';
-import { OnboardingModal } from './OnboardingModal';
-import { RegisterScreen } from './RegisterScreen';
 import { NexusLogo } from './NexusLogo';
+
+const OnboardingModal = React.lazy(() => import('./OnboardingModal').then(m => ({ default: m.OnboardingModal })));
+const RegisterScreen = React.lazy(() => import('./RegisterScreen').then(m => ({ default: m.RegisterScreen })));
 
 interface AuthScreenProps {
   onAuthSuccess: (user: CurrentUser) => void;
@@ -172,10 +173,12 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess, onEmergen
 
   if (viewMode === 'register') {
     return (
-      <RegisterScreen
-        onBackToLogin={() => setViewMode('login')}
-        onRegistrationSuccess={(user) => onAuthSuccess(user)}
-      />
+      <React.Suspense fallback={<div className="flex-1 w-full h-full flex items-center justify-center bg-surface"><div className="w-8 h-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin" /></div>}>
+        <RegisterScreen
+          onBackToLogin={() => setViewMode('login')}
+          onRegistrationSuccess={(user) => onAuthSuccess(user)}
+        />
+      </React.Suspense>
     );
   }
 
@@ -664,17 +667,21 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess, onEmergen
       </main>
 
       {/* 3-Step Interactive Onboarding Modal */}
-      <OnboardingModal
-        isOpen={isOnboardingOpen}
-        onClose={() => setIsOnboardingOpen(false)}
-        onComplete={() => {
-          setIsOnboardingOpen(false);
-          setAuthMode('phone');
-          setPhoneNumber('98765 43210');
-          handleRequestOtp();
-        }}
-        onEmergencyBypass={onEmergencyBypass}
-      />
+      {isOnboardingOpen && (
+        <React.Suspense fallback={null}>
+          <OnboardingModal
+            isOpen={isOnboardingOpen}
+            onClose={() => setIsOnboardingOpen(false)}
+            onComplete={() => {
+              setIsOnboardingOpen(false);
+              setAuthMode('phone');
+              setPhoneNumber('98765 43210');
+              handleRequestOtp();
+            }}
+            onEmergencyBypass={onEmergencyBypass}
+          />
+        </React.Suspense>
+      )}
     </div>
   );
 };

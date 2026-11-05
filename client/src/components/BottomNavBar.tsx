@@ -9,7 +9,7 @@ interface BottomNavBarProps {
   unreadCount?: number;
 }
 
-export const BottomNavBar: React.FC<BottomNavBarProps> = ({
+export const BottomNavBar: React.FC<BottomNavBarProps> = React.memo(({
   activeTab,
   onSelectTab,
   unreadCount = 0
@@ -149,4 +149,4 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
       </div>
     </nav>
   );
-};
+});

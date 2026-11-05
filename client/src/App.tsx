@@ -3,20 +3,29 @@ import { MobileFrameWrapper } from './components/MobileFrameWrapper';
 import { Sidebar } from './components/Sidebar';
 import { ChatWindow } from './components/ChatWindow';
 import { BottomNavBar, TabType } from './components/BottomNavBar';
-import { SatelliteStatusView } from './components/SatelliteStatusView';
-import { SosView } from './components/SosView';
-import { SettingsView } from './components/SettingsView';
-import { CallsView } from './components/CallsView';
-import { OnboardingModal } from './components/OnboardingModal';
-import { UpiPayModal } from './components/UpiPayModal';
-import { CallModal } from './components/CallModal';
-import { WalkieTalkieModal } from './components/WalkieTalkieModal';
-import { StatusModal } from './components/StatusModal';
-import { ProfileModal } from './components/ProfileModal';
-import { NewChatModal } from './components/NewChatModal';
-import { AdminPanelModal } from './components/AdminPanelModal';
-import { ContactInfoModal } from './components/ContactInfoModal';
 import { AuthScreen } from './components/AuthScreen';
+
+// Code-split secondary views & modals for mobile bundle optimization
+const SatelliteStatusView = React.lazy(() => import('./components/SatelliteStatusView').then(m => ({ default: m.SatelliteStatusView })));
+const SosView = React.lazy(() => import('./components/SosView').then(m => ({ default: m.SosView })));
+const SettingsView = React.lazy(() => import('./components/SettingsView').then(m => ({ default: m.SettingsView })));
+const CallsView = React.lazy(() => import('./components/CallsView').then(m => ({ default: m.CallsView })));
+
+const OnboardingModal = React.lazy(() => import('./components/OnboardingModal').then(m => ({ default: m.OnboardingModal })));
+const UpiPayModal = React.lazy(() => import('./components/UpiPayModal').then(m => ({ default: m.UpiPayModal })));
+const CallModal = React.lazy(() => import('./components/CallModal').then(m => ({ default: m.CallModal })));
+const WalkieTalkieModal = React.lazy(() => import('./components/WalkieTalkieModal').then(m => ({ default: m.WalkieTalkieModal })));
+const StatusModal = React.lazy(() => import('./components/StatusModal').then(m => ({ default: m.StatusModal })));
+const ProfileModal = React.lazy(() => import('./components/ProfileModal').then(m => ({ default: m.ProfileModal })));
+const NewChatModal = React.lazy(() => import('./components/NewChatModal').then(m => ({ default: m.NewChatModal })));
+const AdminPanelModal = React.lazy(() => import('./components/AdminPanelModal').then(m => ({ default: m.AdminPanelModal })));
+const ContactInfoModal = React.lazy(() => import('./components/ContactInfoModal').then(m => ({ default: m.ContactInfoModal })));
+
+const ViewLoadingFallback = () => (
+  <div className="flex-1 w-full h-full flex flex-col items-center justify-center p-6 bg-surface">
+    <div className="w-8 h-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+  </div>
+);
 import { 
   Contact, Message, CurrentUser, SatelliteModuleState, MessageMode, GroupMember 
 } from './types';
@@ -574,7 +583,9 @@ export function App() {
 
         {/* Tab View Content */}
         <div className="flex-1 overflow-hidden flex flex-col relative w-full h-full">
-          {renderTabContent()}
+          <React.Suspense fallback={<ViewLoadingFallback />}>
+            {renderTabContent()}
+          </React.Suspense>
         </div>
 
         {/* Bottom Persistent Navigation Bar: visible across all 5 tabs, hidden only when inside an open chat conversation */}
@@ -592,129 +603,149 @@ export function App() {
           </div>
         )}
 
-      {/* MODALS */}
-      <OnboardingModal
-        isOpen={isOnboardingOpen}
-        onClose={() => setIsOnboardingOpen(false)}
-        onComplete={() => {
-          setIsOnboardingOpen(false);
-          setActiveTab('chats');
-        }}
-        onEmergencyBypass={() => {
-          setIsOnboardingOpen(false);
-          setActiveTab('sos');
-        }}
-      />
+      {/* ON-DEMAND LAZY MODALS */}
+      <React.Suspense fallback={null}>
+        {isOnboardingOpen && (
+          <OnboardingModal
+            isOpen={isOnboardingOpen}
+            onClose={() => setIsOnboardingOpen(false)}
+            onComplete={() => {
+              setIsOnboardingOpen(false);
+              setActiveTab('chats');
+            }}
+            onEmergencyBypass={() => {
+              setIsOnboardingOpen(false);
+              setActiveTab('sos');
+            }}
+          />
+        )}
 
-      <AdminPanelModal
-        isOpen={isAdminPanelOpen}
-        onClose={() => setIsAdminPanelOpen(false)}
-        currentUser={currentUser}
-      />
+        {isAdminPanelOpen && (
+          <AdminPanelModal
+            isOpen={isAdminPanelOpen}
+            onClose={() => setIsAdminPanelOpen(false)}
+            currentUser={currentUser}
+          />
+        )}
 
-      <UpiPayModal
-        isOpen={isUpiModalOpen}
-        onClose={() => setIsUpiModalOpen(false)}
-        contact={upiTargetContact}
-        onPaymentSuccess={() => {}}
-      />
+        {isUpiModalOpen && (
+          <UpiPayModal
+            isOpen={isUpiModalOpen}
+            onClose={() => setIsUpiModalOpen(false)}
+            contact={upiTargetContact}
+            onPaymentSuccess={() => {}}
+          />
+        )}
 
-      <CallModal
-        isOpen={isCallModalOpen}
-        onClose={() => setIsCallModalOpen(false)}
-        contact={callTargetContact}
-        callType={callType}
-      />
+        {isCallModalOpen && (
+          <CallModal
+            isOpen={isCallModalOpen}
+            onClose={() => setIsCallModalOpen(false)}
+            contact={callTargetContact}
+            callType={callType}
+          />
+        )}
 
-      <WalkieTalkieModal
-        isOpen={isWalkieTalkieOpen}
-        onClose={() => setIsWalkieTalkieOpen(false)}
-      />
+        {isWalkieTalkieOpen && (
+          <WalkieTalkieModal
+            isOpen={isWalkieTalkieOpen}
+            onClose={() => setIsWalkieTalkieOpen(false)}
+          />
+        )}
 
-      <StatusModal
-        isOpen={isStatusModalOpen}
-        onClose={() => setIsStatusModalOpen(false)}
-        onReplyToStatus={(text) => {
-          if (activeContactId) {
-            handleSendMessage({
-              contactId: activeContactId,
-              text,
-              mode: satelliteState?.mode === 'satellite_only' ? 'satellite' : 'internet'
-            });
-          }
-        }}
-      />
+        {isStatusModalOpen && (
+          <StatusModal
+            isOpen={isStatusModalOpen}
+            onClose={() => setIsStatusModalOpen(false)}
+            onReplyToStatus={(text) => {
+              if (activeContactId) {
+                handleSendMessage({
+                  contactId: activeContactId,
+                  text,
+                  mode: satelliteState?.mode === 'satellite_only' ? 'satellite' : 'internet'
+                });
+              }
+            }}
+          />
+        )}
 
-      <ProfileModal
-        isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
-        currentUser={currentUser}
-        satelliteState={satelliteState}
-        onUpdateProfile={async (data) => {
-          const updated = await updateProfile(data);
-          setCurrentUser(updated);
-          try {
-            localStorage.setItem('nexus_user', JSON.stringify(updated));
-          } catch {}
-        }}
-        onOpenSettings={() => {
-          setIsProfileModalOpen(false);
-          setActiveTab('settings');
-        }}
-        onLogout={handleLogout}
-      />
+        {isProfileModalOpen && (
+          <ProfileModal
+            isOpen={isProfileModalOpen}
+            onClose={() => setIsProfileModalOpen(false)}
+            currentUser={currentUser}
+            satelliteState={satelliteState}
+            onUpdateProfile={async (data) => {
+              const updated = await updateProfile(data);
+              setCurrentUser(updated);
+              try {
+                localStorage.setItem('nexus_user', JSON.stringify(updated));
+              } catch {}
+            }}
+            onOpenSettings={() => {
+              setIsProfileModalOpen(false);
+              setActiveTab('settings');
+            }}
+            onLogout={handleLogout}
+          />
+        )}
 
-      <ContactInfoModal
-        isOpen={isContactInfoOpen}
-        onClose={() => setIsContactInfoOpen(false)}
-        contact={contactInfoTarget}
-        allContacts={contacts}
-        onOpenChat={(c) => {
-          setIsContactInfoOpen(false);
-          setActiveContactId(c.id);
-          setShowMobileChat(true);
-          setActiveTab('chats');
-        }}
-        onStartVoiceCall={(c) => {
-          setIsContactInfoOpen(false);
-          setCallTargetContact(c);
-          setCallType('voice');
-          setIsCallModalOpen(true);
-        }}
-        onStartVideoCall={(c) => {
-          setIsContactInfoOpen(false);
-          setCallTargetContact(c);
-          setCallType('video');
-          setIsCallModalOpen(true);
-        }}
-        onOpenUpiPay={(c) => {
-          setIsContactInfoOpen(false);
-          setUpiTargetContact(c);
-          setIsUpiModalOpen(true);
-        }}
-        onAddMembers={handleAddGroupMembers}
-      />
+        {isContactInfoOpen && (
+          <ContactInfoModal
+            isOpen={isContactInfoOpen}
+            onClose={() => setIsContactInfoOpen(false)}
+            contact={contactInfoTarget}
+            allContacts={contacts}
+            onOpenChat={(c) => {
+              setIsContactInfoOpen(false);
+              setActiveContactId(c.id);
+              setShowMobileChat(true);
+              setActiveTab('chats');
+            }}
+            onStartVoiceCall={(c) => {
+              setIsContactInfoOpen(false);
+              setCallTargetContact(c);
+              setCallType('voice');
+              setIsCallModalOpen(true);
+            }}
+            onStartVideoCall={(c) => {
+              setIsContactInfoOpen(false);
+              setCallTargetContact(c);
+              setCallType('video');
+              setIsCallModalOpen(true);
+            }}
+            onOpenUpiPay={(c) => {
+              setIsContactInfoOpen(false);
+              setUpiTargetContact(c);
+              setIsUpiModalOpen(true);
+            }}
+            onAddMembers={handleAddGroupMembers}
+          />
+        )}
 
-      <NewChatModal
-        isOpen={isNewChatModalOpen}
-        onClose={() => setIsNewChatModalOpen(false)}
-        existingContacts={contacts}
-        initialTab={newChatModalInitialTab}
-        onContactCreated={(newC) => {
-          setContacts((prev) => {
-            const exists = prev.some((c) => c.id === newC.id || (c.nexusId && c.nexusId === newC.nexusId));
-            if (exists) return prev;
-            return [newC, ...prev];
-          });
-          setActiveContactId(newC.id);
-          setShowMobileChat(true);
-          setActiveTab('chats');
-          setMessages((prev) => {
-            if (prev[newC.id]) return prev;
-            return { ...prev, [newC.id]: [] };
-          });
-        }}
-      />
+        {isNewChatModalOpen && (
+          <NewChatModal
+            isOpen={isNewChatModalOpen}
+            onClose={() => setIsNewChatModalOpen(false)}
+            existingContacts={contacts}
+            initialTab={newChatModalInitialTab}
+            onContactCreated={(newC) => {
+              setContacts((prev) => {
+                const exists = prev.some((c) => c.id === newC.id || (c.nexusId && c.nexusId === newC.nexusId));
+                if (exists) return prev;
+                return [newC, ...prev];
+              });
+              setActiveContactId(newC.id);
+              setShowMobileChat(true);
+              setActiveTab('chats');
+              setMessages((prev) => {
+                if (prev[newC.id]) return prev;
+                return { ...prev, [newC.id]: [] };
+              });
+            }}
+          />
+        )}
+      </React.Suspense>
     </MobileFrameWrapper>
   );
 }
