@@ -1,0 +1,25 @@
+{
+  "name": "nexus",
+  "version": "1.0.0",
+  "description": "Nexus - Dual-Mode Sovereign Satellite & Internet Communication Platform",
+  "main": "server/server.js",
+  "scripts": {
+    "dev": "vite",
+    "server": "npm run start --prefix server",
+    "client": "npm run dev --prefix client",
+    "build:client": "npm run build --prefix client"
+  },
+  "keywords": [
+    "messaging",
+    "satellite",
+    "arattai",
+    "whatsapp",
+    "bharat",
+    "nexus"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^8.3.5"
+  }
+}

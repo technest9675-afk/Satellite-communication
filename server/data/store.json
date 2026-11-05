@@ -1,0 +1,919 @@
+{
+  "currentUser": {
+    "id": "contact_aarav",
+    "name": "Dr. Aarav Sharma",
+    "phone": "+91 94120 55123",
+    "nexusId": "NX-AARAV-NDRF",
+    "role": "officer",
+    "status": "NDRF Quick Response Lead",
+    "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+    "state": "Uttarakhand",
+    "satelliteAccess": true,
+    "verifiedBharat": true,
+    "joinedDate": "2026-02-10"
+  },
+  "contacts": [
+    {
+      "id": "user_fee20eb5b6bf7ecc",
+      "name": "Rohan Deshmukh",
+      "role": "Nexus Verified Citizen",
+      "phone": "+91 9774360026",
+      "nexusId": "NX-CITIZEN-9335",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+      "online": true,
+      "lastSeen": "Active now",
+      "satelliteLinked": true,
+      "satelliteSignal": 92,
+      "isGroup": false,
+      "unreadCount": 0,
+      "lastMessage": "Channel established with WebCrypto authenticated encryption",
+      "lastMessageTime": "Just now",
+      "verifiedBharat": true,
+      "encryptionKey": "P-256 ECDH Authenticated",
+      "about": "Nexus Sovereign Citizen."
+    },
+    {
+      "id": "user_8fc2aa4036904940",
+      "name": "Rohan Deshmukh",
+      "role": "Nexus Verified Citizen",
+      "phone": "+91 9949290837",
+      "nexusId": "NX-CITIZEN-3458",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+      "online": true,
+      "lastSeen": "Active now",
+      "satelliteLinked": true,
+      "satelliteSignal": 92,
+      "isGroup": false,
+      "unreadCount": 0,
+      "lastMessage": "Channel established with WebCrypto authenticated encryption",
+      "lastMessageTime": "Just now",
+      "verifiedBharat": true,
+      "encryptionKey": "P-256 ECDH Authenticated",
+      "about": "Nexus Sovereign Citizen."
+    },
+    {
+      "id": "user_e86d9633ad71a027",
+      "name": "Rohan Deshmukh",
+      "role": "Nexus Verified Citizen",
+      "phone": "+91 9277253335",
+      "nexusId": "NX-CITIZEN-8527",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+      "online": true,
+      "lastSeen": "Active now",
+      "satelliteLinked": true,
+      "satelliteSignal": 92,
+      "isGroup": false,
+      "unreadCount": 0,
+      "lastMessage": "Channel established with WebCrypto authenticated encryption",
+      "lastMessageTime": "Just now",
+      "verifiedBharat": true,
+      "encryptionKey": "P-256 ECDH Authenticated",
+      "about": "Nexus Sovereign Citizen."
+    },
+    {
+      "id": "user_638018b1a9c67f8b",
+      "name": "Rohan Deshmukh",
+      "role": "Nexus Verified Citizen",
+      "phone": "+91 9506943207",
+      "nexusId": "NX-CITIZEN-2271",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+      "online": true,
+      "lastSeen": "Active now",
+      "satelliteLinked": true,
+      "satelliteSignal": 92,
+      "isGroup": false,
+      "unreadCount": 0,
+      "lastMessage": "Channel established with WebCrypto authenticated encryption",
+      "lastMessageTime": "Just now",
+      "verifiedBharat": true,
+      "encryptionKey": "P-256 ECDH Authenticated",
+      "about": "Nexus Sovereign Citizen."
+    },
+    {
+      "id": "user_8a1c0868726362a1",
+      "name": "Rohan Deshmukh",
+      "role": "Nexus Verified Citizen",
+      "phone": "+91 9338906064",
+      "nexusId": "NX-CITIZEN-7768",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+      "online": true,
+      "lastSeen": "Active now",
+      "satelliteLinked": true,
+      "satelliteSignal": 92,
+      "isGroup": false,
+      "unreadCount": 0,
+      "lastMessage": "Channel established with WebCrypto authenticated encryption",
+      "lastMessageTime": "Just now",
+      "verifiedBharat": true,
+      "encryptionKey": "P-256 ECDH Authenticated",
+      "about": "Nexus Sovereign Citizen."
+    },
+    {
+      "id": "user_42f1263b8ba7bd97",
+      "name": "Rohan Deshmukh",
+      "role": "Nexus Verified Citizen",
+      "phone": "+91 9589096378",
+      "nexusId": "NX-CITIZEN-1192",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+      "online": true,
+      "lastSeen": "Active now",
+      "satelliteLinked": true,
+      "satelliteSignal": 92,
+      "isGroup": false,
+      "unreadCount": 0,
+      "lastMessage": "Channel established with WebCrypto authenticated encryption",
+      "lastMessageTime": "Just now",
+      "verifiedBharat": true,
+      "encryptionKey": "P-256 ECDH Authenticated",
+      "about": "Nexus Sovereign Citizen."
+    },
+    {
+      "id": "user_3143c497e7a7a07b",
+      "name": "Rohan Deshmukh",
+      "role": "Nexus Verified Citizen",
+      "phone": "+91 9129080618",
+      "nexusId": "NX-CITIZEN-7369",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+      "online": true,
+      "lastSeen": "Active now",
+      "satelliteLinked": true,
+      "satelliteSignal": 92,
+      "isGroup": false,
+      "unreadCount": 0,
+      "lastMessage": "Channel established with WebCrypto authenticated encryption",
+      "lastMessageTime": "Just now",
+      "verifiedBharat": true,
+      "encryptionKey": "P-256 ECDH Authenticated",
+      "about": "Nexus Sovereign Citizen."
+    },
+    {
+      "id": "contact_aarav",
+      "name": "Dr. Aarav Sharma",
+      "role": "NDRF Disaster Response Team",
+      "phone": "+91 94120 55123",
+      "callsign": "RESCUE-LEAD-7",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+      "online": true,
+      "lastSeen": "Active now",
+      "satelliteLinked": true,
+      "satelliteSignal": 94,
+      "isGroup": false,
+      "unreadCount": 2,
+      "lastMessage": "Receiving you loud and clear. Uplink telemetry is optimal in the valley.",
+      "lastMessageTime": "07:43 pm",
+      "verifiedBharat": true,
+      "encryptionKey": "0x8F92...B314 (Double-Ratchet 256)",
+      "about": "Commanding NDRF Quick Reaction Force. All transmissions encrypted under CERT-In directives."
+    },
+    {
+      "id": "contact_isro_ground",
+      "name": "Priya Patel (ISRO NavIC Ops)",
+      "role": "Orbital Telemetry Officer",
+      "phone": "+91 80234 98765",
+      "callsign": "NAVIC-ORBIT-2",
+      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+      "online": true,
+      "lastSeen": "Active now",
+      "satelliteLinked": true,
+      "satelliteSignal": 98,
+      "isGroup": false,
+      "unreadCount": 0,
+      "lastMessage": "GSAT-7A transponder window is open for the next 4 hours. Uplink clear.",
+      "lastMessageTime": "18:15",
+      "verifiedBharat": true,
+      "encryptionKey": "0x4E71...99FA (ISRO Quantum-Safe)",
+      "about": "ISRO Telemetry, Tracking and Command Network (ISTRAC) Bangalore."
+    },
+    {
+      "id": "contact_family",
+      "name": "Family Parivar 🇮🇳",
+      "role": "Group • 6 Members",
+      "phone": "",
+      "callsign": "HOME-GRID",
+      "avatar": "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=150&auto=format&fit=crop&q=80",
+      "online": true,
+      "lastSeen": "Maa is typing...",
+      "satelliteLinked": false,
+      "satelliteSignal": 0,
+      "isGroup": true,
+      "unreadCount": 5,
+      "lastMessage": "Maa: Subah se baarish ho rahi hai, weather update check karo.",
+      "lastMessageTime": "17:45",
+      "verifiedBharat": true,
+      "encryptionKey": "0x11B3...7A89",
+      "about": "Our sweet home group. Share photos, recipes and travel updates."
+    },
+    {
+      "id": "contact_vikram",
+      "name": "Subedar Vikram Singh",
+      "role": "Northern Command / Siachen Outpost",
+      "phone": "+91 97654 32109",
+      "callsign": "HIMALAYA-SENTINEL",
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+      "online": false,
+      "lastSeen": "10 min ago via Satellite",
+      "satelliteLinked": true,
+      "satelliteSignal": 88,
+      "isGroup": false,
+      "unreadCount": 0,
+      "lastMessage": "Heavy blizzard cut terrestrial optical fiber. Now transmitting purely on Nexus Satellite module.",
+      "lastMessageTime": "16:50",
+      "verifiedBharat": true,
+      "encryptionKey": "0x992B...CC88",
+      "about": "Border Security & Patrol Communications Hub."
+    },
+    {
+      "id": "contact_neha",
+      "name": "Neha Gupta",
+      "role": "Product Architect @ Nexus Labs",
+      "phone": "+91 98112 34567",
+      "callsign": "NEXUS-DEV-01",
+      "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
+      "online": true,
+      "lastSeen": "Active now",
+      "satelliteLinked": false,
+      "satelliteSignal": 0,
+      "isGroup": false,
+      "unreadCount": 0,
+      "lastMessage": "Check out the new UPI instant settlement feature in the chat!",
+      "lastMessageTime": "15:20",
+      "verifiedBharat": true,
+      "encryptionKey": "0x32A1...DF01",
+      "about": "Building sovereign Indian communication infrastructure."
+    },
+    {
+      "id": "contact_ndrf_ops",
+      "name": "NDRF Disaster Central Alert 🚨",
+      "role": "National Emergency Broadcast",
+      "phone": "112 / 1070",
+      "callsign": "NDRF-HQ-DELHI",
+      "avatar": "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=150&auto=format&fit=crop&q=80",
+      "online": true,
+      "lastSeen": "Emergency Broadcast Live",
+      "satelliteLinked": true,
+      "satelliteSignal": 100,
+      "isGroup": true,
+      "unreadCount": 1,
+      "lastMessage": "CYCLONE MONITORED: Bay of Bengal alert. Sat-com channels 14 to 28 activated.",
+      "lastMessageTime": "14:02",
+      "verifiedBharat": true,
+      "encryptionKey": "0x00FF...EEDD (Govt Sovereign)",
+      "about": "Official National Disaster Response Force direct communication gateway."
+    }
+  ],
+  "messages": {
+    "contact_aarav": [
+      {
+        "id": "msg_1",
+        "senderId": "contact_aarav",
+        "text": "Namaste Captain Yash! Setting up the mobile medical triage station near Rudraprayag.",
+        "timestamp": "18:25",
+        "mode": "internet",
+        "status": "read",
+        "reactions": [
+          "🙏",
+          "👍"
+        ]
+      },
+      {
+        "id": "msg_2",
+        "senderId": "user_self",
+        "text": "Understood Dr. Aarav. How is the optical fiber backhaul holding up with the landslides?",
+        "timestamp": "18:28",
+        "mode": "internet",
+        "status": "read"
+      },
+      {
+        "id": "msg_3",
+        "senderId": "contact_aarav",
+        "text": "Ground lines just collapsed 5 minutes ago! We turned on the Nexus external satellite module.",
+        "timestamp": "18:30",
+        "mode": "satellite",
+        "satelliteInfo": {
+          "constellation": "ISRO NavIC / GSAT-7A",
+          "snr": "28.4 dB",
+          "compression": "92% payload saving",
+          "hops": 1
+        },
+        "status": "read"
+      },
+      {
+        "id": "msg_4",
+        "senderId": "contact_aarav",
+        "text": "Satellite relay confirmed at Kedarnath base camp. Bandwidth stable.",
+        "timestamp": "18:32",
+        "mode": "satellite",
+        "satelliteInfo": {
+          "constellation": "ISRO NavIC / GSAT-7A",
+          "snr": "29.1 dB",
+          "compression": "94% payload saving",
+          "hops": 1
+        },
+        "status": "read"
+      },
+      {
+        "id": "msg_1793368282384_9vqs",
+        "senderId": "user_self",
+        "text": "hi",
+        "timestamp": "07:21 pm",
+        "mode": "satellite",
+        "type": "text",
+        "status": "satellite_uplinked",
+        "reactions": [],
+        "satelliteInfo": {
+          "constellation": "NavIC (ISRO IRNSS) + GSAT-7A",
+          "snr": "26.6 dB",
+          "compression": "94% payload saving",
+          "hops": 2,
+          "timestampUtc": "2026-10-30T13:51:22.384Z"
+        }
+      },
+      {
+        "id": "msg_reply_1793368283597",
+        "senderId": "contact_aarav",
+        "text": "Copy that Captain. Medical supplies are accounted for. Field triage unit ready.",
+        "timestamp": "07:21 pm",
+        "mode": "satellite",
+        "satelliteInfo": {
+          "constellation": "ISRO NavIC / GSAT-7A",
+          "snr": "36.6 dB",
+          "compression": "94% payload saving",
+          "hops": 1
+        },
+        "status": "delivered",
+        "reactions": []
+      },
+      {
+        "id": "msg_1793368295269_zpt7",
+        "senderId": "user_self",
+        "text": "hi",
+        "timestamp": "07:21 pm",
+        "mode": "internet",
+        "type": "text",
+        "status": "delivered",
+        "reactions": []
+      },
+      {
+        "id": "msg_reply_1793368296483",
+        "senderId": "contact_aarav",
+        "text": "Dr. Sharma here: Patient stabilized. Satellite data compression saved critical seconds.",
+        "timestamp": "07:21 pm",
+        "mode": "internet",
+        "status": "delivered",
+        "reactions": []
+      },
+      {
+        "id": "msg_1793368305663_hp6l",
+        "senderId": "user_self",
+        "text": "Transmitting via Satellite All clear here Share your location",
+        "timestamp": "07:21 pm",
+        "mode": "internet",
+        "type": "text",
+        "status": "delivered",
+        "reactions": []
+      },
+      {
+        "id": "msg_reply_1793368306878",
+        "senderId": "contact_aarav",
+        "text": "Dr. Sharma here: Patient stabilized. Satellite data compression saved critical seconds.",
+        "timestamp": "07:21 pm",
+        "mode": "internet",
+        "status": "delivered",
+        "reactions": []
+      },
+      {
+        "id": "msg_1793369611736_118v",
+        "senderId": "contact_aarav",
+        "senderName": "Dr. Aarav Sharma",
+        "text": "All clear here",
+        "timestamp": "07:43 pm",
+        "mode": "internet",
+        "type": "text",
+        "status": "delivered",
+        "reactions": []
+      },
+      {
+        "id": "msg_reply_1793369612944",
+        "senderId": "contact_aarav",
+        "text": "Receiving you loud and clear. Uplink telemetry is optimal in the valley.",
+        "timestamp": "07:43 pm",
+        "mode": "internet",
+        "status": "delivered",
+        "reactions": []
+      }
+    ],
+    "contact_isro_ground": [
+      {
+        "id": "msg_ig_1",
+        "senderId": "contact_isro_ground",
+        "text": "Greetings Yash! Telemetry check from ISTRAC ground terminal.",
+        "timestamp": "18:05",
+        "mode": "satellite",
+        "satelliteInfo": {
+          "constellation": "NavIC-1I (Orbit 36,000 km)",
+          "snr": "34.2 dB",
+          "compression": "95%",
+          "hops": 1
+        },
+        "status": "read"
+      },
+      {
+        "id": "msg_ig_2",
+        "senderId": "user_self",
+        "text": "Signal is remarkably crisp. What is the current transponder window for northern latitudes?",
+        "timestamp": "18:10",
+        "mode": "satellite",
+        "satelliteInfo": {
+          "constellation": "NavIC-1I",
+          "snr": "33.8 dB",
+          "compression": "93%",
+          "hops": 1
+        },
+        "status": "read"
+      },
+      {
+        "id": "msg_ig_3",
+        "senderId": "contact_isro_ground",
+        "text": "GSAT-7A transponder window is open for the next 4 hours. Uplink clear.",
+        "timestamp": "18:15",
+        "mode": "satellite",
+        "satelliteInfo": {
+          "constellation": "GSAT-7A Military / Civilian Dual-band",
+          "snr": "36.5 dB",
+          "compression": "96%",
+          "hops": 1
+        },
+        "status": "read"
+      }
+    ],
+    "contact_family": [
+      {
+        "id": "msg_fam_1",
+        "senderId": "user_self",
+        "text": "Sab kaisa hai ghar par? (How is everything at home?)",
+        "timestamp": "17:30",
+        "mode": "internet",
+        "status": "read"
+      },
+      {
+        "id": "msg_fam_2",
+        "senderId": "contact_family",
+        "senderName": "Papa",
+        "text": "Sab theek hai beta! Tumhari behan ka college admission confirm ho gaya.",
+        "timestamp": "17:35",
+        "mode": "internet",
+        "status": "read",
+        "reactions": [
+          "❤️",
+          "🎉"
+        ]
+      },
+      {
+        "id": "msg_fam_3",
+        "senderId": "contact_family",
+        "senderName": "Maa",
+        "text": "Subah se baarish ho rahi hai, weather update check karo.",
+        "timestamp": "17:45",
+        "mode": "internet",
+        "status": "read"
+      }
+    ],
+    "contact_vikram": [
+      {
+        "id": "msg_vik_1",
+        "senderId": "contact_vikram",
+        "text": "Jai Hind Captain. Temperature is -24°C up here on the glacier.",
+        "timestamp": "16:40",
+        "mode": "satellite",
+        "satelliteInfo": {
+          "constellation": "GSAT-7A",
+          "snr": "26.1 dB",
+          "compression": "90%",
+          "hops": 2
+        },
+        "status": "read"
+      },
+      {
+        "id": "msg_vik_2",
+        "senderId": "contact_vikram",
+        "text": "Heavy blizzard cut terrestrial optical fiber. Now transmitting purely on Nexus Satellite module.",
+        "timestamp": "16:50",
+        "mode": "satellite",
+        "satelliteInfo": {
+          "constellation": "GSAT-7A",
+          "snr": "25.8 dB",
+          "compression": "91%",
+          "hops": 2
+        },
+        "status": "read"
+      }
+    ],
+    "contact_neha": [
+      {
+        "id": "msg_neh_1",
+        "senderId": "contact_neha",
+        "text": "Hey Yash! We just tested the DPDP Act 2023 compliance sandbox and local Indian data residency validation.",
+        "timestamp": "15:10",
+        "mode": "internet",
+        "status": "read"
+      },
+      {
+        "id": "msg_neh_2",
+        "senderId": "contact_neha",
+        "text": "Check out the new UPI instant settlement feature in the chat!",
+        "timestamp": "15:20",
+        "mode": "internet",
+        "status": "read",
+        "type": "upi_transfer",
+        "upiDetails": {
+          "amount": 500,
+          "senderVpa": "neha@okaxis",
+          "receiverVpa": "yash@oknexus",
+          "utr": "UPI/20261030/982341992",
+          "note": "Project Coffee & Samosas ☕🇮🇳",
+          "status": "COMPLETED"
+        }
+      }
+    ],
+    "contact_ndrf_ops": [
+      {
+        "id": "msg_ndrf_1",
+        "senderId": "contact_ndrf_ops",
+        "text": "CYCLONE MONITORED: Bay of Bengal alert. Sat-com channels 14 to 28 activated.",
+        "timestamp": "14:02",
+        "mode": "satellite",
+        "satelliteInfo": {
+          "constellation": "NavIC Regional Emergency Grid",
+          "snr": "40.0 dB",
+          "compression": "98%",
+          "hops": 1
+        },
+        "status": "read",
+        "type": "emergency_alert",
+        "alertDetails": {
+          "level": "ORANGE ALERT",
+          "category": "Severe Cyclonic Storm",
+          "area": "Odisha - West Bengal Coastline",
+          "satFrequency": "1420.45 MHz (L5 NavIC Band)"
+        }
+      },
+      {
+        "id": "msg_sos_1793368365411",
+        "senderId": "user_self",
+        "text": "🚨 SOS EMERGENCY BEACON TRIGGERED! Coordinates: 28.6139°N, 77.2090°E [MGRS 43R FK 2341 8912]. Need: Medical Evacuation & Emergency Satellite Uplink",
+        "timestamp": "07:22 pm",
+        "mode": "satellite",
+        "type": "emergency_alert",
+        "alertDetails": {
+          "level": "CRITICAL CODE RED",
+          "category": "SOS Emergency Evac Beacon",
+          "area": "New Delhi / National Capital Region, India",
+          "coordinates": "28.6139°N, 77.2090°E",
+          "gridRef": "MGRS 43R FK 2341 8912",
+          "battery": "89%"
+        },
+        "status": "satellite_uplinked"
+      },
+      {
+        "id": "msg_sos_1793860272275",
+        "senderId": "user_yash",
+        "senderName": "Captain Yash Vardhan",
+        "text": "🚨 SOS EMERGENCY BEACON TRIGGERED! Coordinates: 28.6139°N, 77.2090°E [MGRS 43R FK 2341 8912]. Need: Hypothermia",
+        "timestamp": "12:01 pm",
+        "mode": "satellite",
+        "type": "emergency_alert",
+        "alertDetails": {
+          "level": "CRITICAL CODE RED",
+          "category": "SOS Emergency Evac Beacon",
+          "area": "New Delhi / National Capital Region, India",
+          "coordinates": "28.6139°N, 77.2090°E",
+          "gridRef": "MGRS 43R FK 2341 8912",
+          "battery": "89%"
+        },
+        "status": "satellite_uplinked"
+      },
+      {
+        "id": "msg_sos_1793860272278",
+        "senderId": "user_yash",
+        "senderName": "Captain Yash Vardhan",
+        "text": "🚨 SOS EMERGENCY BEACON TRIGGERED! Coordinates: 28.6139°N, 77.2090°E [MGRS 43R FK 2341 8912]. Need: Hypothermia",
+        "timestamp": "12:01 pm",
+        "mode": "satellite",
+        "type": "emergency_alert",
+        "alertDetails": {
+          "level": "CRITICAL CODE RED",
+          "category": "SOS Emergency Evac Beacon",
+          "area": "New Delhi / National Capital Region, India",
+          "coordinates": "28.6139°N, 77.2090°E",
+          "gridRef": "MGRS 43R FK 2341 8912",
+          "battery": "89%"
+        },
+        "status": "satellite_uplinked"
+      },
+      {
+        "id": "msg_sos_1793860449438",
+        "senderId": "user_yash",
+        "senderName": "Captain Yash Vardhan",
+        "text": "🚨 SOS EMERGENCY BEACON TRIGGERED! Coordinates: 28.6139°N, 77.2090°E [MGRS 43R FK 2341 8912]. Need: Hypothermia",
+        "timestamp": "12:04 pm",
+        "mode": "satellite",
+        "type": "emergency_alert",
+        "alertDetails": {
+          "level": "CRITICAL CODE RED",
+          "category": "SOS Emergency Evac Beacon",
+          "area": "New Delhi / National Capital Region, India",
+          "coordinates": "28.6139°N, 77.2090°E",
+          "gridRef": "MGRS 43R FK 2341 8912",
+          "battery": "89%"
+        },
+        "status": "satellite_uplinked"
+      },
+      {
+        "id": "msg_sos_1793860449450",
+        "senderId": "user_yash",
+        "senderName": "Captain Yash Vardhan",
+        "text": "🚨 SOS EMERGENCY BEACON TRIGGERED! Coordinates: 28.6139°N, 77.2090°E [MGRS 43R FK 2341 8912]. Need: Hypothermia",
+        "timestamp": "12:04 pm",
+        "mode": "satellite",
+        "type": "emergency_alert",
+        "alertDetails": {
+          "level": "CRITICAL CODE RED",
+          "category": "SOS Emergency Evac Beacon",
+          "area": "New Delhi / National Capital Region, India",
+          "coordinates": "28.6139°N, 77.2090°E",
+          "gridRef": "MGRS 43R FK 2341 8912",
+          "battery": "89%"
+        },
+        "status": "satellite_uplinked"
+      }
+    ]
+  },
+  "satelliteModule": {
+    "connected": true,
+    "hardwareModel": "Nexus-Orb-v4 Micro-Transceiver (NavIC/GSAT/Iridium Compatible)",
+    "serialNumber": "NX-SAT-2026-IND-9912",
+    "battery": 89,
+    "signalStrength": 92,
+    "activeConstellation": "NavIC (ISRO IRNSS) + GSAT-7A",
+    "elevationAngle": "54.2° NNE",
+    "azimuth": "128.4°",
+    "frequency": "1176.45 MHz (L5) / 2492.028 MHz (S-Band)",
+    "uplinkBitrate": "2.4 kbps (Extreme Low Power Burst)",
+    "encryptionStandard": "Bharat-E2EE 256-bit ASCON / ChaCha20",
+    "mode": "auto_hybrid",
+    "location": {
+      "lat": 28.6139,
+      "lng": 77.209,
+      "grid": "MGRS 43R FK 2341 8912",
+      "place": "New Delhi / National Capital Region, India"
+    }
+  },
+  "upiTransactions": [],
+  "registeredUsers": [
+    {
+      "id": "user_fee20eb5b6bf7ecc",
+      "name": "Rohan Deshmukh",
+      "email": "citizentest_1793881772581@nexus.gov.in",
+      "phone": "+91 9774360026",
+      "nexusId": "NX-CITIZEN-9335",
+      "role": "citizen",
+      "passwordHash": "$2b$10$L4entBGWawneHm/Lhch1duU/sO442DgT1SHMGRkv0RNT23rub54ca",
+      "status": "Active on Nexus Sovereign Net",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+      "state": "National Node",
+      "satelliteAccess": true,
+      "verifiedBharat": true,
+      "joinedDate": "2026-11-05"
+    },
+    {
+      "id": "user_8fc2aa4036904940",
+      "name": "Rohan Deshmukh",
+      "email": "citizentest_1793880142067@nexus.gov.in",
+      "phone": "+91 9949290837",
+      "nexusId": "NX-CITIZEN-3458",
+      "role": "citizen",
+      "passwordHash": "$2b$10$dA.LW2D9Bn2ptVvxMYmDpuu38CDYtblrl7waQsqvWnMtF4iq9Gveq",
+      "status": "Active on Nexus Sovereign Net",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+      "state": "National Node",
+      "satelliteAccess": true,
+      "verifiedBharat": true,
+      "joinedDate": "2026-11-05"
+    },
+    {
+      "id": "user_e86d9633ad71a027",
+      "name": "Rohan Deshmukh",
+      "email": "citizentest_1793879324277@nexus.gov.in",
+      "phone": "+91 9277253335",
+      "nexusId": "NX-CITIZEN-8527",
+      "role": "citizen",
+      "passwordHash": "$2b$10$UGgbX0UBWk2rbgFiAWUT4.Rw0SF3mfBJ1s8WM7Iz5aIDAahMDd.C.",
+      "status": "Active on Nexus Sovereign Net",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+      "state": "National Node",
+      "satelliteAccess": true,
+      "verifiedBharat": true,
+      "joinedDate": "2026-11-05"
+    },
+    {
+      "id": "user_638018b1a9c67f8b",
+      "name": "Rohan Deshmukh",
+      "email": "citizentest_1793877261166@nexus.gov.in",
+      "phone": "+91 9506943207",
+      "nexusId": "NX-CITIZEN-2271",
+      "role": "citizen",
+      "passwordHash": "$2b$10$4LmIvDvmhWDltNMs3jHg5eDWCPYAMEett541evEj1X000mzIkxbOq",
+      "status": "Active on Nexus Sovereign Net",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+      "state": "National Node",
+      "satelliteAccess": true,
+      "verifiedBharat": true,
+      "joinedDate": "2026-11-05"
+    },
+    {
+      "id": "user_8a1c0868726362a1",
+      "name": "Rohan Deshmukh",
+      "email": "citizentest_1793875179408@nexus.gov.in",
+      "phone": "+91 9338906064",
+      "nexusId": "NX-CITIZEN-7768",
+      "role": "citizen",
+      "passwordHash": "$2b$10$9zClSJUi3YHb6N7ylwUMxu5ZO0K.ynAXLGakew9RYbi1dwPVxw6eO",
+      "status": "Active on Nexus Sovereign Net",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+      "state": "National Node",
+      "satelliteAccess": true,
+      "verifiedBharat": true,
+      "joinedDate": "2026-11-05"
+    },
+    {
+      "id": "user_42f1263b8ba7bd97",
+      "name": "Rohan Deshmukh",
+      "email": "citizentest_1793872957956@nexus.gov.in",
+      "phone": "+91 9589096378",
+      "nexusId": "NX-CITIZEN-1192",
+      "role": "citizen",
+      "passwordHash": "$2b$10$cWQgFZBXI/CT02mSZAw66eTTkKXUqa332qYju8jG48B3d1us4z6Qa",
+      "status": "Active on Nexus Sovereign Net",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+      "state": "National Node",
+      "satelliteAccess": true,
+      "verifiedBharat": true,
+      "joinedDate": "2026-11-05"
+    },
+    {
+      "id": "user_3143c497e7a7a07b",
+      "name": "Rohan Deshmukh",
+      "email": "citizentest_1793870300653@nexus.gov.in",
+      "phone": "+91 9129080618",
+      "nexusId": "NX-CITIZEN-7369",
+      "role": "citizen",
+      "passwordHash": "$2b$10$c2GfX56LMsIl22BLZxAZIO7zYGM/VQVrABj1/7wjd2nS7ub6.qptO",
+      "status": "Active on Nexus Sovereign Net",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+      "state": "National Node",
+      "satelliteAccess": true,
+      "verifiedBharat": true,
+      "joinedDate": "2026-11-05"
+    },
+    {
+      "id": "user_yash",
+      "name": "Captain Yash Vardhan",
+      "phone": "+91 98765 43210",
+      "nexusId": "NX-CAPTAIN-YASH",
+      "role": "admin",
+      "status": "Operational | Satellite & 5G Active",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      "state": "Delhi NCR",
+      "satelliteAccess": true,
+      "verifiedBharat": true,
+      "joinedDate": "2026-01-15"
+    },
+    {
+      "id": "contact_aarav",
+      "name": "Dr. Aarav Sharma",
+      "phone": "+91 94120 55123",
+      "nexusId": "NX-AARAV-NDRF",
+      "role": "officer",
+      "status": "NDRF Quick Response Lead",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+      "state": "Uttarakhand",
+      "satelliteAccess": true,
+      "verifiedBharat": true,
+      "joinedDate": "2026-02-10"
+    },
+    {
+      "id": "contact_isro_ground",
+      "name": "Priya Patel",
+      "phone": "+91 80234 98765",
+      "nexusId": "NX-PRIYA-ISRO",
+      "role": "officer",
+      "status": "ISTRAC Orbital Telemetry",
+      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+      "state": "Karnataka",
+      "satelliteAccess": true,
+      "verifiedBharat": true,
+      "joinedDate": "2026-03-01"
+    },
+    {
+      "id": "contact_vikram",
+      "name": "Subedar Vikram Singh",
+      "phone": "+91 97654 32109",
+      "nexusId": "NX-VIKRAM-ARMY",
+      "role": "officer",
+      "status": "Siachen Glacial Patrol Command",
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+      "state": "Ladakh",
+      "satelliteAccess": true,
+      "verifiedBharat": true,
+      "joinedDate": "2026-03-12"
+    },
+    {
+      "id": "contact_neha",
+      "name": "Neha Gupta",
+      "phone": "+91 98112 34567",
+      "nexusId": "NX-NEHA-LABS",
+      "role": "citizen",
+      "status": "Tech Architect",
+      "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
+      "state": "Maharashtra",
+      "satelliteAccess": true,
+      "verifiedBharat": true,
+      "joinedDate": "2026-04-05"
+    },
+    {
+      "id": "NEXUS-DEMO",
+      "name": "Demo Explorer",
+      "phone": "+91 00000 00000",
+      "email": "demo@nexus.internal",
+      "nexusId": "NX-DEMO-VISITOR",
+      "role": "demo",
+      "status": "Guest Explorer • Fictional Sandbox",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "state": "National Orbital Grid",
+      "satelliteAccess": true,
+      "verifiedBharat": true,
+      "joinedDate": "2026-11-05",
+      "publicKey": "{\"crv\":\"P-256\",\"ext\":true,\"key_ops\":[],\"kty\":\"EC\",\"x\":\"xe6kOofCkNP-of9gvrH2hDV5u2x0hoQN8xNYDz34Rs0\",\"y\":\"1jwDyWG336TQ_zZAGxD08hcdrevxE24La1AUA-N04oQ\"}"
+    }
+  ],
+  "groundStations": [
+    {
+      "id": "ISTRAC-BLR",
+      "name": "ISTRAC Primary Ground Terminal",
+      "location": "Bengaluru, Karnataka",
+      "status": "ONLINE",
+      "load": "42%"
+    },
+    {
+      "id": "ISRO-HASSAN",
+      "name": "Master Control Facility (MCF)",
+      "location": "Hassan, Karnataka",
+      "status": "ONLINE",
+      "load": "38%"
+    },
+    {
+      "id": "NAVIC-LKO",
+      "name": "Regional Monitoring Uplink",
+      "location": "Lucknow, Uttar Pradesh",
+      "status": "ONLINE",
+      "load": "29%"
+    },
+    {
+      "id": "COASTAL-PBL",
+      "name": "Island & Maritime Gateway",
+      "location": "Port Blair, Andaman & Nicobar",
+      "status": "ONLINE",
+      "load": "51%"
+    },
+    {
+      "id": "NORTH-LEH",
+      "name": "High-Altitude Glacial Node",
+      "location": "Leh, Ladakh",
+      "status": "ONLINE",
+      "load": "18%"
+    }
+  ],
+  "adminAuditLog": [
+    {
+      "id": 1,
+      "action": "Sovereign Node Initialization",
+      "timestamp": "2026-10-30 09:00",
+      "by": "System",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 2,
+      "action": "DPDP Act 2023 Cryptographic Audit Passed",
+      "timestamp": "2026-10-30 12:30",
+      "by": "CERT-In Bot",
+      "status": "VERIFIED"
+    },
+    {
+      "id": 3,
+      "action": "NavIC-1A Transponder Window Locked",
+      "timestamp": "2026-10-30 15:45",
+      "by": "NX-PRIYA-ISRO",
+      "status": "ACTIVE"
+    }
+  ]
+}
