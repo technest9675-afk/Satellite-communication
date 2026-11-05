@@ -10,8 +10,6 @@ interface SidebarProps {
   onSelectContact: (id: string) => void;
   currentUser: CurrentUser | null;
   satelliteState: SatelliteModuleState | null;
-  onOpenSatelliteConsole: () => void;
-  onOpenVault: () => void;
   onOpenContactInfo?: (contact: Contact) => void;
   onOpenProfile?: () => void;
   onOpenStatus: () => void;
@@ -30,8 +28,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectContact,
   currentUser,
   satelliteState,
-  onOpenSatelliteConsole,
-  onOpenVault,
   onOpenContactInfo,
   onOpenProfile,
   onOpenStatus,
@@ -118,7 +114,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className="relative cursor-pointer shrink-0 transition-transform active:scale-95 hover:opacity-90"
               onClick={() => {
                 if (onOpenProfile) onOpenProfile();
-                else onOpenVault();
                 sounds.playClickSound();
               }}
               title="My Profile"
@@ -200,19 +195,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     >
                       <span className="material-symbols-outlined text-base text-secondary">radio</span>
                       <span>Walkie-Talkie Radio</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        onOpenVault();
-                        sounds.playClickSound();
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-on-surface hover:bg-surface-container-highest transition text-left"
-                    >
-                      <span className="material-symbols-outlined text-base text-primary">security</span>
-                      <span>Security &amp; E2EE Vault</span>
                     </button>
 
                     {/* RBAC: Only show Admin Console if user is admin */}

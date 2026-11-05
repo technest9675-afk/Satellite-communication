@@ -1,25 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Radio, X, Compass, Zap, Shield, AlertTriangle, 
-  Satellite, RefreshCw, Cpu, Activity, Signal, Battery, CheckCircle
+  Compass, AlertTriangle, Satellite, RefreshCw, 
+  Cpu, Signal, Battery, CheckCircle, ChevronDown, ChevronUp, Radio
 } from 'lucide-react';
 import { SatelliteModuleState } from '../types';
 import { toggleSatelliteModule, dispatchSosBeacon } from '../services/api';
 import { sounds } from '../services/soundEffects';
 
-interface SatelliteConsoleModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+interface SatelliteHubSectionProps {
   satelliteState: SatelliteModuleState | null;
-  onUpdateState: (newState: SatelliteModuleState) => void;
+  onUpdateState?: (newState: SatelliteModuleState) => void;
+  onOpenSos?: () => void;
+  defaultExpanded?: boolean;
 }
 
-export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
-  isOpen,
-  onClose,
+export const SatelliteHubSection: React.FC<SatelliteHubSectionProps> = ({
   satelliteState,
-  onUpdateState
+  onUpdateState,
+  onOpenSos,
+  defaultExpanded = false
 }) => {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [selectedSat, setSelectedSat] = useState<string>('NavIC-1A');
   const [sosSent, setSosSent] = useState(false);
@@ -27,6 +28,13 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
   const [localMode, setLocalMode] = useState<'internet_only' | 'satellite_only' | 'auto_hybrid'>(
     satelliteState?.mode || 'auto_hybrid'
   );
+
+  // Synchronize local mode if external satellite state changes
+  useEffect(() => {
+    if (satelliteState?.mode) {
+      setLocalMode(satelliteState.mode);
+    }
+  }, [satelliteState?.mode]);
 
   // Satellites for radar simulation
   const satellites = [
@@ -37,9 +45,9 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
     { id: 'Iridium-Next', name: 'Iridium-Next Interop 142', dist: 0.85, angle: 165, snr: '28.0 dB', freq: '1621.25 MHz L-Band', status: 'POLAR PASS' }
   ];
 
-  // Draw Radar Canvas
+  // Draw Radar Canvas when expanded
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isExpanded) return;
 
     let animFrame: number;
     let angle = 0;
@@ -56,11 +64,11 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
       const centerY = height / 2;
       const radius = Math.min(centerX, centerY) - 15;
 
-      // Clear with dark tactical blue-black background
+      // Dark tactical blue-black background
       ctx.fillStyle = '#060a10';
       ctx.fillRect(0, 0, width, height);
 
-      // Draw concentric radar range rings
+      // Concentric radar range rings
       ctx.strokeStyle = '#1e293b';
       ctx.lineWidth = 1;
       for (let i = 1; i <= 4; i++) {
@@ -68,13 +76,12 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
         ctx.arc(centerX, centerY, (radius / 4) * i, 0, Math.PI * 2);
         ctx.stroke();
 
-        // Range labels
         ctx.fillStyle = '#475569';
         ctx.font = '9px monospace';
         ctx.fillText(`${i * 9000}km`, centerX + 4, centerY - (radius / 4) * i + 10);
       }
 
-      // Draw crosshairs
+      // Crosshairs
       ctx.beginPath();
       ctx.moveTo(centerX - radius, centerY);
       ctx.lineTo(centerX + radius, centerY);
@@ -90,7 +97,7 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
       ctx.fillText('E', centerX + radius - 14, centerY + 4);
       ctx.fillText('W', centerX - radius + 4, centerY + 4);
 
-      // Draw sweeping radar beam with gradient
+      // Sweeping radar beam with gradient
       angle = (angle + 0.02) % (Math.PI * 2);
 
       const sweepGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
@@ -123,7 +130,7 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
 
         const isSelected = selectedSat === sat.id;
 
-        // Satellite glow
+        // Satellite dot & glow
         ctx.beginPath();
         ctx.arc(sx, sy, isSelected ? 8 : 4, 0, Math.PI * 2);
         ctx.fillStyle = isSelected ? '#38bdf8' : '#10b981';
@@ -132,7 +139,7 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
         ctx.fill();
         ctx.shadowBlur = 0;
 
-        // Satellite ring if selected
+        // Dashed ring if selected
         if (isSelected) {
           ctx.beginPath();
           ctx.arc(sx, sy, 12, 0, Math.PI * 2);
@@ -157,18 +164,18 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
     return () => {
       cancelAnimationFrame(animFrame);
     };
-  }, [isOpen, selectedSat]);
-
-  if (!isOpen) return null;
+  }, [isExpanded, selectedSat]);
 
   const handleModeChange = async (mode: 'internet_only' | 'satellite_only' | 'auto_hybrid') => {
     setLocalMode(mode);
     try {
       const updated = await toggleSatelliteModule(true, mode);
-      onUpdateState(updated);
+      if (onUpdateState) {
+        onUpdateState(updated);
+      }
       sounds.playSatelliteChirp();
     } catch (e) {
-      console.error(e);
+      console.error('Failed to change satellite mode', e);
     }
   };
 
@@ -181,11 +188,14 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
         notes: 'High-Priority Distress Beacon Broadcasted from Nexus Handheld'
       });
       setSosSent(true);
+      if (onOpenSos) {
+        // notify parent
+      }
       setTimeout(() => {
         setIsTransmitting(false);
       }, 1500);
     } catch (e) {
-      console.error(e);
+      console.error('Failed to dispatch SOS beacon', e);
       setIsTransmitting(false);
     }
   };
@@ -193,41 +203,63 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
   const currentSatObj = satellites.find(s => s.id === selectedSat) || satellites[0];
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2.5 bg-black/60 dark:bg-black/85 backdrop-blur-md animate-fade-in select-none">
-      <div className="bg-surface dark:bg-[#0b121c] text-on-surface border border-sky-500/30 rounded-2xl w-full max-w-[390px] max-h-[90dvh] overflow-hidden flex flex-col shadow-2xl sat-glow">
-        {/* Header */}
-        <div className="px-4 py-3 bg-surface-container-low dark:bg-[#0e1724] border-b border-surface-container-highest dark:border-slate-800 flex items-center justify-between shrink-0">
-          <div className="flex items-center space-x-2.5 min-w-0">
-            <div className="p-2 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30 shrink-0">
-              <Satellite className="w-5 h-5 animate-pulse" />
+    <div className="w-full rounded-2xl bg-surface-container-high/70 dark:bg-[#0c1420] border border-sky-500/30 overflow-hidden shadow-md transition-all">
+      {/* Expandable Header / Trigger Button */}
+      <button
+        type="button"
+        onClick={() => {
+          sounds.playClickSound();
+          setIsExpanded(!isExpanded);
+        }}
+        className="w-full p-3 flex items-center justify-between text-left hover:bg-surface-container-highest/60 dark:hover:bg-slate-800/60 transition-colors"
+      >
+        <div className="flex items-center gap-3 min-w-0 pr-2">
+          <div className="w-10 h-10 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center shrink-0 border border-sky-500/30">
+            <Satellite className="w-5 h-5 animate-pulse" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h3 className="text-xs sm:text-sm font-bold text-on-surface dark:text-white truncate">
+                Nexus-Orb Satellite Hub
+              </h3>
+              <span className="text-[9px] font-mono font-bold uppercase px-1.5 py-0.2 rounded bg-sky-500/15 text-sky-400 border border-sky-500/30 shrink-0">
+                NavIC / GSAT-7A
+              </span>
             </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <h2 className="font-bold text-sm text-on-surface dark:text-white truncate">
-                  Nexus-Orb Satellite Hub
-                </h2>
-                <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/30 shrink-0 font-mono">
-                  NavIC / GSAT-7A
-                </span>
-              </div>
-              <p className="text-[11px] text-on-surface-variant dark:text-on-surface-variant dark:text-slate-400 truncate">
-                Off-Grid Satellite Transceiver Emulation
-              </p>
+            <p className="text-[11px] text-on-surface-variant dark:text-slate-400 truncate mt-0.5">
+              {satelliteState?.signalStrength || 92}% Signal • {satelliteState?.battery ?? 89}% Battery • {isExpanded ? 'Tap to Collapse' : 'Tap to Expand Live Hub'}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold bg-sky-500/10 text-sky-400 border border-sky-500/20 hidden sm:inline-block">
+            {isExpanded ? 'ACTIVE' : 'EXPAND'}
+          </span>
+          <div className="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-sky-400 transition-colors">
+            {isExpanded ? (
+              <ChevronUp className="w-4 h-4 text-sky-400" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-on-surface-variant" />
+            )}
+          </div>
+        </div>
+      </button>
+
+      {/* Expanded Satellite Hub Body */}
+      {isExpanded && (
+        <div className="p-3.5 pt-1 space-y-3.5 border-t border-sky-500/20 bg-surface-container-low/40 dark:bg-[#070b12]/60 animate-fade-in">
+          {/* Simulated Telemetry Notice */}
+          <div className="p-2.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-xs flex items-center gap-2 text-sky-300">
+            <Radio className="w-4 h-4 shrink-0 text-sky-400" />
+            <div className="text-[11px] leading-tight">
+              <span className="font-semibold">Simulated Orbital Telemetry:</span> Hardware transceiver emulation active for NavIC L5 &amp; GSAT-7A constellation testing.
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-on-surface-variant dark:text-on-surface-variant dark:text-slate-400 hover:text-on-surface dark:hover:text-white hover:bg-surface-container-high dark:hover:bg-slate-800 transition-colors shrink-0 ml-1"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Content Body */}
-        <div className="flex-1 overflow-y-auto p-3.5 space-y-3.5">
-          {/* Top Diagnostic Grid */}
+          {/* 1. Top Diagnostic Grid */}
           <div className="grid grid-cols-2 gap-2">
+            {/* Signal Quality */}
             <div className="bg-surface-container-low dark:bg-[#121c2a] p-2.5 rounded-xl border border-surface-container-highest dark:border-slate-800 flex items-center space-x-2.5 min-w-0">
               <div className="p-2 rounded-lg bg-sky-500/10 text-sky-400 shrink-0">
                 <Signal className="w-4 h-4" />
@@ -240,6 +272,7 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
               </div>
             </div>
 
+            {/* Module Battery */}
             <div className="bg-surface-container-low dark:bg-[#121c2a] p-2.5 rounded-xl border border-surface-container-highest dark:border-slate-800 flex items-center space-x-2.5 min-w-0">
               <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 shrink-0">
                 <Battery className="w-4 h-4" />
@@ -247,11 +280,12 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
               <div className="min-w-0 flex-1">
                 <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono truncate">Module Battery</p>
                 <p className="text-xs font-bold text-emerald-300 truncate">
-                  {satelliteState?.battery || 89}% (14h Active)
+                  {satelliteState?.battery ?? 89}% (14h Active)
                 </p>
               </div>
             </div>
 
+            {/* Antenna Azimuth and Elevation */}
             <div className="bg-surface-container-low dark:bg-[#121c2a] p-2.5 rounded-xl border border-surface-container-highest dark:border-slate-800 flex items-center space-x-2.5 min-w-0">
               <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 shrink-0">
                 <Compass className="w-4 h-4" />
@@ -264,6 +298,7 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
               </div>
             </div>
 
+            {/* Compression */}
             <div className="bg-surface-container-low dark:bg-[#121c2a] p-2.5 rounded-xl border border-surface-container-highest dark:border-slate-800 flex items-center space-x-2.5 min-w-0">
               <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 shrink-0">
                 <Cpu className="w-4 h-4" />
@@ -277,99 +312,103 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
             </div>
           </div>
 
-          {/* Interactive Radar & Tracking Section */}
-          <div className="flex flex-col gap-3">
-            {/* Canvas Radar Visualizer */}
-            <div className="flex flex-col items-center bg-surface-container-lowest dark:bg-[#070b12] p-3 rounded-2xl border border-surface-container-highest dark:border-slate-800 relative">
-              <div className="w-full flex items-center justify-between mb-2">
-                <span className="text-[11px] font-mono text-sky-400 flex items-center space-x-1.5 truncate">
-                  <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping shrink-0" />
-                  <span className="truncate">LIVE ORBITAL RADAR (ISRO NavIC)</span>
-                </span>
-                <span className="text-[9px] font-mono text-on-surface-variant dark:text-slate-400 shrink-0 ml-1">
-                  28.6°N • 77.2°E
-                </span>
-              </div>
-
-              <canvas
-                ref={canvasRef}
-                width={260}
-                height={260}
-                className="w-[220px] h-[220px] aspect-square rounded-full shadow-inner border border-sky-950 mx-auto"
-              />
-
-              <div className="flex items-center space-x-1.5 mt-2.5 overflow-x-auto w-full justify-center no-scrollbar">
-                {satellites.map(sat => (
-                  <button
-                    key={sat.id}
-                    onClick={() => setSelectedSat(sat.id)}
-                    className={`px-2 py-0.5 rounded-md text-[10px] font-mono transition-all shrink-0 ${
-                      selectedSat === sat.id
-                        ? 'bg-sky-500 text-slate-950 font-bold'
-                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                    }`}
-                  >
-                    {sat.id}
-                  </button>
-                ))}
-              </div>
+          {/* 2. Interactive Live Orbital Radar */}
+          <div className="flex flex-col items-center bg-surface-container-lowest dark:bg-[#070b12] p-3 rounded-2xl border border-surface-container-highest dark:border-slate-800 relative shadow-inner">
+            <div className="w-full flex items-center justify-between mb-2">
+              <span className="text-[11px] font-mono text-sky-400 flex items-center space-x-1.5 truncate">
+                <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping shrink-0" />
+                <span className="truncate">LIVE ORBITAL RADAR (ISRO NavIC)</span>
+              </span>
+              <span className="text-[9px] font-mono text-on-surface-variant dark:text-slate-400 shrink-0 ml-1">
+                28.6°N • 77.2°E
+              </span>
             </div>
 
-            {/* Satellite Pass Telemetry */}
-            <div className="bg-surface-container-low dark:bg-[#0e1622] p-3 rounded-2xl border border-surface-container-highest dark:border-slate-800 space-y-2.5">
-              <h3 className="font-bold text-xs text-white flex items-center justify-between">
-                <span>Selected Transponder</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono">
-                  {currentSatObj.status}
-                </span>
-              </h3>
+            <canvas
+              ref={canvasRef}
+              width={260}
+              height={260}
+              className="w-[210px] h-[210px] sm:w-[230px] sm:h-[230px] aspect-square rounded-full shadow-inner border border-sky-950 mx-auto"
+            />
 
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="p-2 bg-slate-900/80 rounded-xl border border-slate-800">
-                  <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono">Constellation ID</p>
-                  <p className="font-semibold text-sky-300 truncate">{currentSatObj.name}</p>
-                </div>
-
-                <div className="p-2 bg-slate-900/80 rounded-xl border border-slate-800">
-                  <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono">Frequency</p>
-                  <p className="font-semibold text-slate-200 truncate">{currentSatObj.freq}</p>
-                </div>
-
-                <div className="p-2 bg-slate-900/80 rounded-xl border border-slate-800">
-                  <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono">SNR</p>
-                  <p className="font-bold text-emerald-400">{currentSatObj.snr}</p>
-                </div>
-
-                <div className="p-2 bg-slate-900/80 rounded-xl border border-slate-800">
-                  <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono">Bitrate</p>
-                  <p className="font-bold text-white">2.4 kbps</p>
-                </div>
-              </div>
-
-              <div className="p-2.5 bg-sky-950/40 rounded-xl border border-sky-500/30 text-[11px] text-sky-200 leading-relaxed">
-                <span className="font-bold">Antenna Tip:</span> Aim external module towards south-east horizon at 54° elevation angle.
-              </div>
+            {/* 3. Satellite Selection */}
+            <div className="flex items-center space-x-1.5 mt-2.5 overflow-x-auto w-full justify-center no-scrollbar py-0.5">
+              {satellites.map(sat => (
+                <button
+                  key={sat.id}
+                  type="button"
+                  onClick={() => {
+                    sounds.playClickSound();
+                    setSelectedSat(sat.id);
+                  }}
+                  className={`px-2.5 py-1 rounded-md text-[10px] font-mono transition-all shrink-0 ${
+                    selectedSat === sat.id
+                      ? 'bg-sky-500 text-slate-950 font-bold shadow-xs'
+                      : 'bg-surface-container-high dark:bg-slate-800 text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-highest'
+                  }`}
+                >
+                  {sat.id}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Mode Switcher */}
+          {/* 4. Selected Transponder & Antenna Tilt */}
           <div className="bg-surface-container-low dark:bg-[#0e1622] p-3 rounded-2xl border border-surface-container-highest dark:border-slate-800 space-y-2.5">
-            <h3 className="font-bold text-xs text-white">
+            <h4 className="font-bold text-xs text-on-surface dark:text-white flex items-center justify-between">
+              <span>Selected Transponder</span>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono font-bold">
+                {currentSatObj.status}
+              </span>
+            </h4>
+
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="p-2 bg-surface-container dark:bg-slate-900/80 rounded-xl border border-surface-container-highest dark:border-slate-800">
+                <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono">Constellation ID</p>
+                <p className="font-semibold text-sky-400 dark:text-sky-300 truncate">{currentSatObj.name}</p>
+              </div>
+
+              <div className="p-2 bg-surface-container dark:bg-slate-900/80 rounded-xl border border-surface-container-highest dark:border-slate-800">
+                <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono">Frequency</p>
+                <p className="font-semibold text-on-surface dark:text-slate-200 truncate">{currentSatObj.freq}</p>
+              </div>
+
+              <div className="p-2 bg-surface-container dark:bg-slate-900/80 rounded-xl border border-surface-container-highest dark:border-slate-800">
+                <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono">SNR</p>
+                <p className="font-bold text-emerald-400">{currentSatObj.snr}</p>
+              </div>
+
+              <div className="p-2 bg-surface-container dark:bg-slate-900/80 rounded-xl border border-surface-container-highest dark:border-slate-800">
+                <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono">Bitrate</p>
+                <p className="font-bold text-on-surface dark:text-white">2.4 kbps</p>
+              </div>
+            </div>
+
+            {/* Antenna Tilt Guidance */}
+            <div className="p-2.5 bg-sky-500/10 dark:bg-sky-950/40 rounded-xl border border-sky-500/30 text-[11px] text-sky-300 leading-relaxed">
+              <span className="font-bold">Antenna Tilt Tip:</span> Aim external module towards south-east horizon at 54° elevation angle for peak SNR lock.
+            </div>
+          </div>
+
+          {/* 5. Transmission Routing Policy */}
+          <div className="bg-surface-container-low dark:bg-[#0e1622] p-3 rounded-2xl border border-surface-container-highest dark:border-slate-800 space-y-2">
+            <h4 className="font-bold text-xs text-on-surface dark:text-white">
               Transmission Routing Policy
-            </h3>
+            </h4>
 
             <div className="flex flex-col gap-2">
               <button
+                type="button"
                 onClick={() => handleModeChange('auto_hybrid')}
                 className={`p-2.5 rounded-xl border text-left transition-all ${
                   localMode === 'auto_hybrid'
-                    ? 'bg-emerald-500/20 border-emerald-500/50 text-white'
-                    : 'bg-slate-900 border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-slate-700'
+                    ? 'bg-emerald-500/20 border-emerald-500/50 text-on-surface dark:text-white shadow-xs'
+                    : 'bg-surface-container dark:bg-slate-900 border-surface-container-highest dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <div className="flex items-center space-x-2 mb-0.5">
                   <div className={`w-2 h-2 rounded-full ${localMode === 'auto_hybrid' ? 'bg-emerald-400' : 'bg-slate-600'}`} />
-                  <span className="font-bold text-xs text-white">Auto Hybrid (Recommended)</span>
+                  <span className="font-bold text-xs text-on-surface dark:text-white">Auto Hybrid (Recommended)</span>
                 </div>
                 <p className="text-[11px] text-on-surface-variant dark:text-slate-400 pl-4">
                   Prioritizes 5G / Fiber; instantly falls back to Satellite module if off-grid.
@@ -377,33 +416,35 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
               </button>
 
               <button
+                type="button"
                 onClick={() => handleModeChange('satellite_only')}
                 className={`p-2.5 rounded-xl border text-left transition-all ${
                   localMode === 'satellite_only'
-                    ? 'bg-sky-500/20 border-sky-500/50 text-white sat-glow'
-                    : 'bg-slate-900 border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-slate-700'
+                    ? 'bg-sky-500/20 border-sky-500/50 text-on-surface dark:text-white shadow-xs'
+                    : 'bg-surface-container dark:bg-slate-900 border-surface-container-highest dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <div className="flex items-center space-x-2 mb-0.5">
                   <div className={`w-2 h-2 rounded-full ${localMode === 'satellite_only' ? 'bg-sky-400' : 'bg-slate-600'}`} />
-                  <span className="font-bold text-xs text-white">Pure Satellite Only</span>
+                  <span className="font-bold text-xs text-on-surface dark:text-white">Pure Satellite Only</span>
                 </div>
                 <p className="text-[11px] text-on-surface-variant dark:text-slate-400 pl-4">
-                  Zero internet required. 100% data compressed & beamed directly to NavIC/GSAT.
+                  Zero internet required. 100% data compressed &amp; beamed directly to NavIC/GSAT.
                 </p>
               </button>
 
               <button
+                type="button"
                 onClick={() => handleModeChange('internet_only')}
                 className={`p-2.5 rounded-xl border text-left transition-all ${
                   localMode === 'internet_only'
-                    ? 'bg-teal-500/20 border-teal-500/50 text-white'
-                    : 'bg-slate-900 border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-slate-700'
+                    ? 'bg-teal-500/20 border-teal-500/50 text-on-surface dark:text-white shadow-xs'
+                    : 'bg-surface-container dark:bg-slate-900 border-surface-container-highest dark:border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <div className="flex items-center space-x-2 mb-0.5">
                   <div className={`w-2 h-2 rounded-full ${localMode === 'internet_only' ? 'bg-teal-400' : 'bg-slate-600'}`} />
-                  <span className="font-bold text-xs text-white">Standard Internet Only</span>
+                  <span className="font-bold text-xs text-on-surface dark:text-white">Standard Internet Only</span>
                 </div>
                 <p className="text-[11px] text-on-surface-variant dark:text-slate-400 pl-4">
                   Uses Wi-Fi and Cellular broadband only. Satellite radio powers down.
@@ -412,19 +453,20 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
             </div>
           </div>
 
-          {/* Emergency SOS Distress Beacon */}
+          {/* 6. Emergency SOS Distress Uplink */}
           <div className="bg-gradient-to-r from-rose-950/80 via-rose-900/40 to-slate-900 p-3 rounded-2xl border border-rose-500/50 flex flex-col gap-2.5">
             <div className="space-y-1">
-              <h3 className="font-bold text-xs text-rose-300 flex items-center space-x-1.5">
+              <h4 className="font-bold text-xs text-rose-300 flex items-center space-x-1.5">
                 <AlertTriangle className="w-4 h-4 text-rose-400 animate-pulse shrink-0" />
                 <span>One-Touch Emergency SOS Distress Uplink</span>
-              </h3>
+              </h4>
               <p className="text-[11px] text-rose-200/80 leading-relaxed">
                 Broadcasts an emergency EPIRB beacon with your sovereign GPS coordinates to NDRF Disaster Control and local military rescue responders via NavIC emergency channel.
               </p>
             </div>
 
             <button
+              type="button"
               onClick={handleTriggerSos}
               disabled={isTransmitting}
               className={`w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white shadow-xl transition-all flex items-center justify-center space-x-2 shrink-0 ${
@@ -436,12 +478,12 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
               {isTransmitting ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Uplinking SOS...</span>
+                  <span>Uplinking SOS Beacon...</span>
                 </>
               ) : sosSent ? (
                 <>
                   <CheckCircle className="w-4 h-4" />
-                  <span>SOS Acknowledged</span>
+                  <span>SOS Beacon Acknowledged</span>
                 </>
               ) : (
                 <>
@@ -451,22 +493,23 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
               )}
             </button>
           </div>
-        </div>
 
-        {/* Footer */}
-        <div className="px-3.5 py-2.5 bg-surface-container-low dark:bg-[#0e1622] border-t border-surface-container-highest dark:border-slate-800 flex items-center justify-between text-xs text-on-surface-variant dark:text-on-surface-variant dark:text-slate-400 shrink-0 gap-2">
-          <div className="flex items-center space-x-1.5 min-w-0">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-            <span className="truncate text-[11px] font-mono text-slate-300">NX-SAT-9912 (Active)</span>
+          {/* Collapse Button */}
+          <div className="pt-1 flex justify-center">
+            <button
+              type="button"
+              onClick={() => {
+                sounds.playClickSound();
+                setIsExpanded(false);
+              }}
+              className="px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant text-[11px] font-semibold flex items-center gap-1 transition-colors"
+            >
+              <ChevronUp className="w-3.5 h-3.5" />
+              <span>Collapse Satellite Hub</span>
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs transition-colors shrink-0"
-          >
-            Close Terminal
-          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 };

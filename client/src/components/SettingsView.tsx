@@ -4,15 +4,15 @@ import { sounds } from '../services/soundEffects';
 import { EmergencyContactsModal } from './EmergencyContactsModal';
 import { QrCodeModal } from './QrCodeModal';
 import { NexusLogo } from './NexusLogo';
+import { SatelliteHubSection } from './SatelliteHubSection';
 import { useTranslation, LANGUAGE_OPTIONS } from '../services/i18n';
 
 interface SettingsViewProps {
   currentUser: CurrentUser | null;
   satelliteState: SatelliteModuleState | null;
   onLogout: () => void;
-  onOpenVault: () => void;
   onOpenProfile?: () => void;
-  onOpenSatelliteConsole: () => void;
+  onUpdateSatelliteState?: (state: SatelliteModuleState) => void;
   onOpenSos: () => void;
 }
 
@@ -20,9 +20,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   currentUser,
   satelliteState,
   onLogout,
-  onOpenVault,
   onOpenProfile,
-  onOpenSatelliteConsole,
+  onUpdateSatelliteState,
   onOpenSos
 }) => {
   const [fallbackAlert, setFallbackAlert] = useState(() => {
@@ -280,27 +279,19 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-surface-container-high">
+          <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-surface-container-high">
             <button
               type="button"
               onClick={onOpenProfile}
-              className="flex items-center justify-center gap-1 py-2 px-1 rounded-lg bg-primary/15 hover:bg-primary/25 text-primary border border-primary/30 active:scale-98 transition shadow-xs"
+              className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg bg-primary/15 hover:bg-primary/25 text-primary border border-primary/30 active:scale-98 transition shadow-xs"
             >
               <span className="material-symbols-outlined text-base">person</span>
               <span className="text-xs font-semibold">Profile</span>
             </button>
             <button
               type="button"
-              onClick={onOpenVault}
-              className="flex items-center justify-center gap-1 py-2 px-1 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface active:scale-98 transition"
-            >
-              <span className="material-symbols-outlined text-base text-primary">security</span>
-              <span className="text-xs font-semibold">Vault</span>
-            </button>
-            <button
-              type="button"
               onClick={handleShareCallsign}
-              className="flex items-center justify-center gap-1 py-2 px-1 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface active:scale-98 transition"
+              className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface active:scale-98 transition"
             >
               <span className="material-symbols-outlined text-base text-secondary">share</span>
               <span className="text-xs font-semibold">Callsign</span>
@@ -318,45 +309,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
 
           <div className="bg-surface-container rounded-2xl p-2.5 space-y-2 shadow-sm border border-surface-container-high">
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={onOpenSatelliteConsole}
-              className="w-full flex items-center justify-between p-2.5 bg-surface-container-high rounded-xl hover:bg-surface-container-highest active:scale-99 transition cursor-pointer"
-            >
-              <div className="flex items-center gap-3 min-w-0 pr-2">
-                <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-xl">sync_alt</span>
-                </div>
-                <div className="text-left min-w-0">
-                  <div className="text-xs text-on-surface font-semibold truncate">{t('settings_routing', 'Satellite & Internet Routing')}</div>
-                  <div className="text-[11px] text-on-surface-variant truncate">{t('settings_routing_desc', 'Cellular, Wi-Fi & Satellite auto-switch')}</div>
-                </div>
-              </div>
-              <span className="material-symbols-outlined text-on-surface-variant shrink-0">chevron_right</span>
-            </div>
-
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={onOpenSatelliteConsole}
-              className="w-full flex items-center justify-between p-2.5 bg-surface-container-high rounded-xl hover:bg-surface-container-highest active:scale-99 transition cursor-pointer"
-            >
-              <div className="flex items-center gap-3 min-w-0 pr-2">
-                <div className="w-9 h-9 rounded-lg bg-secondary/10 text-secondary flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-xl">cell_tower</span>
-                </div>
-                <div className="text-left min-w-0">
-                  <div className="text-xs text-on-surface font-semibold truncate">{t('settings_device', 'Nexus Satellite Device')}</div>
-                  <div className="text-[11px] text-secondary truncate">
-                    {satelliteState?.hardwareConnected
-                      ? `Connected • ${satelliteState.battery ?? 94}% Battery Remaining`
-                      : 'Module Detached • Standby Mesh Mode'}
-                  </div>
-                </div>
-              </div>
-              <span className="px-2 py-0.5 bg-surface-container rounded text-xs font-medium text-on-surface-variant shrink-0">Manage</span>
-            </div>
+            {/* Integrated Nexus-Orb Satellite Hub */}
+            <SatelliteHubSection
+              satelliteState={satelliteState}
+              onUpdateState={onUpdateSatelliteState}
+              onOpenSos={onOpenSos}
+            />
 
             <div className="flex items-center justify-between p-2.5 bg-surface-container-high rounded-xl">
               <div className="flex items-center gap-3 pr-3 min-w-0 flex-1">
@@ -396,24 +354,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
 
           <div className="bg-surface-container rounded-2xl p-2.5 space-y-2 shadow-sm border border-surface-container-high">
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={onOpenVault}
-              className="w-full flex items-center justify-between p-2.5 bg-surface-container-high rounded-xl hover:bg-surface-container-highest active:scale-99 transition cursor-pointer"
-            >
-              <div className="flex items-center gap-3 min-w-0 pr-2">
-                <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-xl">lock</span>
-                </div>
-                <div className="text-left min-w-0">
-                  <div className="text-xs text-on-surface font-semibold truncate">{t('settings_e2ee', 'End-to-End Encryption')}</div>
-                  <div className="text-[11px] text-primary truncate">Double-Ratchet + ASCON-128a Active</div>
-                </div>
-              </div>
-              <span className="material-symbols-outlined text-on-surface-variant shrink-0">chevron_right</span>
-            </div>
-
             <div
               role="button"
               tabIndex={0}

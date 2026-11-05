@@ -7,14 +7,12 @@ interface SatelliteStatusViewProps {
   satelliteState: SatelliteModuleState | null;
   onUpdateState: (state: SatelliteModuleState) => void;
   onOpenSos: () => void;
-  onOpenAdvancedConsole: () => void;
 }
 
 export const SatelliteStatusView: React.FC<SatelliteStatusViewProps> = ({
   satelliteState,
   onUpdateState,
   onOpenSos,
-  onOpenAdvancedConsole
 }) => {
   const [connectionMode, setConnectionMode] = useState<'auto' | 'satellite_only'>('auto');
   const [azimuthAngle, setAzimuthAngle] = useState(45);
@@ -81,14 +79,7 @@ export const SatelliteStatusView: React.FC<SatelliteStatusViewProps> = ({
               <span className="font-mono text-[10px] font-bold tracking-wider">SOS</span>
             </button>
 
-            <button
-              type="button"
-              onClick={onOpenAdvancedConsole}
-              title="Advanced Orbital Radar Console"
-              className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors"
-            >
-              <span className="material-symbols-outlined text-lg">radar</span>
-            </button>
+
           </div>
         </div>
       </header>

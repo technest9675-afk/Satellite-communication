@@ -8,12 +8,10 @@ import { SosView } from './components/SosView';
 import { SettingsView } from './components/SettingsView';
 import { CallsView } from './components/CallsView';
 import { OnboardingModal } from './components/OnboardingModal';
-import { SatelliteConsoleModal } from './components/SatelliteConsoleModal';
 import { UpiPayModal } from './components/UpiPayModal';
 import { CallModal } from './components/CallModal';
 import { WalkieTalkieModal } from './components/WalkieTalkieModal';
 import { StatusModal } from './components/StatusModal';
-import { SecurityVaultModal } from './components/SecurityVaultModal';
 import { ProfileModal } from './components/ProfileModal';
 import { NewChatModal } from './components/NewChatModal';
 import { AdminPanelModal } from './components/AdminPanelModal';
@@ -51,7 +49,6 @@ export function App() {
 
   // Modals state
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
-  const [isSatModalOpen, setIsSatModalOpen] = useState(false);
   const [isUpiModalOpen, setIsUpiModalOpen] = useState(false);
   const [upiTargetContact, setUpiTargetContact] = useState<Contact | null>(null);
   const [isCallModalOpen, setIsCallModalOpen] = useState(false);
@@ -59,7 +56,6 @@ export function App() {
   const [callTargetContact, setCallTargetContact] = useState<Contact | null>(null);
   const [isWalkieTalkieOpen, setIsWalkieTalkieOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const [isVaultModalOpen, setIsVaultModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
   const [newChatModalInitialTab, setNewChatModalInitialTab] = useState<'contacts' | 'add'>('contacts');
@@ -454,7 +450,6 @@ export function App() {
             satelliteState={satelliteState}
             onUpdateState={(updated) => setSatelliteState(updated)}
             onOpenSos={() => setActiveTab('sos')}
-            onOpenAdvancedConsole={() => setIsSatModalOpen(true)}
           />
         );
 
@@ -467,9 +462,8 @@ export function App() {
             currentUser={currentUser}
             satelliteState={satelliteState}
             onLogout={handleLogout}
-            onOpenVault={() => setIsVaultModalOpen(true)}
             onOpenProfile={() => setIsProfileModalOpen(true)}
-            onOpenSatelliteConsole={() => setIsSatModalOpen(true)}
+            onUpdateSatelliteState={(updated) => setSatelliteState(updated)}
             onOpenSos={() => setActiveTab('sos')}
           />
         );
@@ -501,8 +495,6 @@ export function App() {
                   setIsUpiModalOpen(true);
                 }}
                 onOpenWalkieTalkie={() => setIsWalkieTalkieOpen(true)}
-                onOpenSatelliteConsole={() => setIsSatModalOpen(true)}
-                onOpenVault={() => setIsVaultModalOpen(true)}
                 onConnectHardwareModule={handleConnectHardwareModule}
                 onBack={() => setShowMobileChat(false)}
                 onOpenContactInfo={handleOpenContactInfo}
@@ -523,8 +515,6 @@ export function App() {
               }}
               currentUser={currentUser}
               satelliteState={satelliteState}
-              onOpenSatelliteConsole={() => setIsSatModalOpen(true)}
-              onOpenVault={() => setIsVaultModalOpen(true)}
               onOpenProfile={() => setIsProfileModalOpen(true)}
               onOpenStatus={() => setIsStatusModalOpen(true)}
               onOpenNewChat={handleOpenNewChat}
@@ -622,13 +612,6 @@ export function App() {
         currentUser={currentUser}
       />
 
-      <SatelliteConsoleModal
-        isOpen={isSatModalOpen}
-        onClose={() => setIsSatModalOpen(false)}
-        satelliteState={satelliteState}
-        onUpdateState={(updated) => setSatelliteState(updated)}
-      />
-
       <UpiPayModal
         isOpen={isUpiModalOpen}
         onClose={() => setIsUpiModalOpen(false)}
@@ -662,11 +645,6 @@ export function App() {
         }}
       />
 
-      <SecurityVaultModal
-        isOpen={isVaultModalOpen}
-        onClose={() => setIsVaultModalOpen(false)}
-      />
-
       <ProfileModal
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
@@ -678,10 +656,6 @@ export function App() {
           try {
             localStorage.setItem('nexus_user', JSON.stringify(updated));
           } catch {}
-        }}
-        onOpenVault={() => {
-          setIsProfileModalOpen(false);
-          setIsVaultModalOpen(true);
         }}
         onOpenSettings={() => {
           setIsProfileModalOpen(false);

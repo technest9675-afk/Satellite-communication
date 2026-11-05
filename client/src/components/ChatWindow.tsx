@@ -24,8 +24,6 @@ interface ChatWindowProps {
   onStartVideoCall: (contact: Contact) => void;
   onOpenUpiPay: (contact: Contact) => void;
   onOpenWalkieTalkie: () => void;
-  onOpenSatelliteConsole: () => void;
-  onOpenVault: () => void;
   onOpenContactInfo?: (contact: Contact) => void;
   onConnectHardwareModule: () => void;
   onBack: () => void;
@@ -43,8 +41,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   onStartVideoCall,
   onOpenUpiPay,
   onOpenWalkieTalkie,
-  onOpenSatelliteConsole,
-  onOpenVault,
   onOpenContactInfo,
   onConnectHardwareModule,
   onBack,
@@ -200,7 +196,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               className="relative shrink-0 cursor-pointer active:scale-95 transition-transform"
               onClick={() => {
                 if (onOpenContactInfo) onOpenContactInfo(contact);
-                else onOpenVault();
               }}
               title={contact.isGroup ? 'View Group Info' : 'View Contact Info'}
             >
@@ -218,7 +213,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               className="flex flex-col min-w-0 pl-0.5 sm:pl-1 cursor-pointer"
               onClick={() => {
                 if (onOpenContactInfo) onOpenContactInfo(contact);
-                else onOpenVault();
               }}
               title={contact.isGroup ? 'View Group Info' : 'View Contact Info'}
             >
@@ -273,15 +267,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               <span className="material-symbols-outlined text-lg sm:text-xl text-secondary">radio</span>
             </button>
 
-            <button
-              type="button"
-              aria-label="More Options"
-              onClick={onOpenSatelliteConsole}
-              className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container active:scale-95 transition-all"
-              title="Satellite Diagnostics"
-            >
-              <span className="material-symbols-outlined text-lg sm:text-xl">more_vert</span>
-            </button>
+
           </div>
         </div>
       </header>

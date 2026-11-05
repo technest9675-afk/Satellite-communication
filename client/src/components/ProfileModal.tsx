@@ -11,7 +11,6 @@ interface ProfileModalProps {
   currentUser: CurrentUser | null;
   satelliteState?: SatelliteModuleState | null;
   onUpdateProfile?: (data: Partial<CurrentUser>) => Promise<void>;
-  onOpenVault?: () => void;
   onOpenSettings?: () => void;
   onLogout?: () => void;
 }
@@ -22,7 +21,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   currentUser,
   satelliteState,
   onUpdateProfile,
-  onOpenVault,
   onOpenSettings,
   onLogout
 }) => {
@@ -328,9 +326,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold uppercase bg-primary-container text-on-primary-container border border-primary/20">
                     {currentUser.role === 'admin' ? 'Commanding Officer (Admin)' : 'Verified Citizen Node'}
                   </span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono text-primary bg-primary/10 border border-primary/20">
-                    DPDP 2023 Compliant
-                  </span>
+
                 </div>
               </div>
             </div>
@@ -458,36 +454,22 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               </div>
             </div>
 
-            {/* QUICK ACTIONS */}
-            <div className="grid grid-cols-2 gap-2 pt-1">
+            <div className="pt-1">
               <button
                 type="button"
                 onClick={() => setIsQrOpen(true)}
-                className="p-3 rounded-xl bg-surface-container hover:bg-surface-container-high dark:bg-slate-900 dark:hover:bg-slate-800 border border-surface-container-highest dark:border-slate-800 flex items-center gap-2 text-left transition-colors shadow-xs"
+                className="w-full p-3 rounded-xl bg-surface-container hover:bg-surface-container-high dark:bg-slate-900 dark:hover:bg-slate-800 border border-surface-container-highest dark:border-slate-800 flex items-center justify-between text-left transition-colors shadow-xs"
               >
-                <div className="w-8 h-8 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-lg">qr_code_2</span>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-lg">qr_code_2</span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-on-surface dark:text-white truncate">My Sovereign QR Code</p>
+                    <p className="text-[10px] text-on-surface-variant dark:text-slate-400 truncate">Instant peer scan &amp; verification</p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-bold text-on-surface dark:text-white truncate">My QR Code</p>
-                  <p className="text-[10px] text-on-surface-variant dark:text-slate-400 truncate">Instant peer scan</p>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  if (onOpenVault) onOpenVault();
-                }}
-                className="p-3 rounded-xl bg-surface-container hover:bg-surface-container-high dark:bg-slate-900 dark:hover:bg-slate-800 border border-surface-container-highest dark:border-slate-800 flex items-center gap-2 text-left transition-colors shadow-xs"
-              >
-                <div className="w-8 h-8 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-lg">security</span>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-bold text-on-surface dark:text-white truncate">Security Vault</p>
-                  <p className="text-[10px] text-on-surface-variant dark:text-slate-400 truncate">DPDP Compliance</p>
-                </div>
+                <span className="material-symbols-outlined text-sm text-outline">chevron_right</span>
               </button>
             </div>
 
