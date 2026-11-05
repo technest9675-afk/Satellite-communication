@@ -1,0 +1,5 @@
+# NEXUS Sovereign Web Platform — Netlify SPA Routing & API Proxy
+# 1. Forward API routes if backend proxy configured, else allow custom proxy
+/api/*  /api/:splat  200
+# 2. Single-Page Application Client-Side Routing Fallback
+/*      /index.html  200

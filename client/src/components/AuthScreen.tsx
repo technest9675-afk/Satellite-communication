@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CurrentUser } from '../types';
-import { requestOtpApi, verifyOtpApi, loginDemoApi } from '../services/api';
+import { requestOtpApi, verifyOtpApi, loginDemoApi, FALLBACK_DEMO_USER } from '../services/api';
 import { sounds } from '../services/soundEffects';
 import { NexusLogo } from './NexusLogo';
 
@@ -86,7 +86,12 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess, onEmergen
       setOtpCode('');
       setInfoMessage(res.message || 'Verification OTP dispatched.');
     } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to request verification code. Please check your connection.');
+      const msg = err?.message || '';
+      if (!msg || msg.includes('JSON') || msg.includes('Unexpected') || msg.includes('SyntaxError')) {
+        setErrorMessage('NEXUS gateway is currently unreachable. Please check your network connection.');
+      } else {
+        setErrorMessage(msg);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +118,12 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess, onEmergen
         onAuthSuccess(res.user);
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Verification failed. Please check the code and try again.');
+      const msg = err?.message || '';
+      if (!msg || msg.includes('JSON') || msg.includes('Unexpected') || msg.includes('SyntaxError')) {
+        setErrorMessage('Failed to verify code due to connection error. Please try again.');
+      } else {
+        setErrorMessage(msg);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -155,17 +165,21 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess, onEmergen
 
   // Dedicated Public Explore Demo Handler
   const handleExploreDemo = async () => {
+    if (isDemoLoading || isLoading) return;
     setIsDemoLoading(true);
     setErrorMessage('');
     setInfoMessage('');
     sounds.playSatelliteChirp();
     try {
       const res = await loginDemoApi();
-      if (res.user) {
+      if (res?.user) {
         onAuthSuccess(res.user);
+      } else {
+        onAuthSuccess(FALLBACK_DEMO_USER);
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to start demo session.');
+      console.warn('Sandbox init note, entering local demo state:', err);
+      onAuthSuccess(FALLBACK_DEMO_USER);
     } finally {
       setIsDemoLoading(false);
     }

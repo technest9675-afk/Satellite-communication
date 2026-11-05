@@ -2284,7 +2284,7 @@ if (fs.existsSync(CLIENT_DIST)) {
   });
 }
 
-server.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, () => {
   console.log(`=======================================================`);
   console.log(`  🚀 NEXUS SOVEREIGN GATEWAY ACTIVE ON PORT ${PORT}`);
   console.log(`  🛡️ Security Headers, Rate Limiting & Cryptographic OTP: ENABLED`);

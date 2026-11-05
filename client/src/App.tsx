@@ -33,7 +33,7 @@ import {
   fetchContacts, fetchMessages, 
   fetchSatelliteStatus, sendMessageApi, toggleMessageReaction, 
   toggleHardwareModule, socket, fetchCurrentUser, logoutApi, updateProfile, getAuthToken,
-  resetDemoDataApi, addGroupMembers 
+  resetDemoDataApi, addGroupMembers, clearAuthToken, FALLBACK_DEMO_USER, FALLBACK_DEMO_CONTACTS 
 } from './services/api';
 import { getOrCreateLocalIdentity, encryptMessagePayload } from './services/cryptoEngine';
 import { sounds } from './services/soundEffects';
@@ -150,10 +150,15 @@ export function App() {
         }
       })
       .catch((err) => {
+        if (token.includes('demo') || token.startsWith('nexus_demo')) {
+          setCurrentUser(FALLBACK_DEMO_USER);
+          return;
+        }
         console.warn('Session verification failed, requesting login', err);
         setCurrentUser(null);
         try {
           localStorage.removeItem('nexus_user');
+          clearAuthToken();
         } catch {}
       });
   }, []);
@@ -305,6 +310,7 @@ export function App() {
     } catch {}
     try {
       localStorage.removeItem('nexus_user');
+      clearAuthToken();
     } catch {}
     setCurrentUser(null);
     setContacts([]);
