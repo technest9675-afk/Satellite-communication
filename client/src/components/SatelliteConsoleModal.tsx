@@ -193,24 +193,24 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
   const currentSatObj = satellites.find(s => s.id === selectedSat) || satellites[0];
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2.5 bg-black/85 backdrop-blur-md animate-fade-in select-none">
-      <div className="bg-[#0b121c] border border-sky-500/30 rounded-2xl w-full max-w-[390px] max-h-[90dvh] overflow-hidden flex flex-col shadow-2xl sat-glow">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2.5 bg-black/60 dark:bg-black/85 backdrop-blur-md animate-fade-in select-none">
+      <div className="bg-surface dark:bg-[#0b121c] text-on-surface border border-sky-500/30 rounded-2xl w-full max-w-[390px] max-h-[90dvh] overflow-hidden flex flex-col shadow-2xl sat-glow">
         {/* Header */}
-        <div className="px-4 py-3 bg-[#0e1724] border-b border-slate-800 flex items-center justify-between shrink-0">
+        <div className="px-4 py-3 bg-surface-container-low dark:bg-[#0e1724] border-b border-surface-container-highest dark:border-slate-800 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-2.5 min-w-0">
             <div className="p-2 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30 shrink-0">
               <Satellite className="w-5 h-5 animate-pulse" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <h2 className="font-bold text-sm text-white truncate">
+                <h2 className="font-bold text-sm text-on-surface dark:text-white truncate">
                   Nexus-Orb Satellite Hub
                 </h2>
                 <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/30 shrink-0 font-mono">
                   NavIC / GSAT-7A
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 truncate">
+              <p className="text-[11px] text-on-surface-variant dark:text-on-surface-variant dark:text-slate-400 truncate">
                 Off-Grid Satellite Transceiver Emulation
               </p>
             </div>
@@ -218,7 +218,7 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors shrink-0 ml-1"
+            className="p-1.5 rounded-lg text-on-surface-variant dark:text-on-surface-variant dark:text-slate-400 hover:text-on-surface dark:hover:text-white hover:bg-surface-container-high dark:hover:bg-slate-800 transition-colors shrink-0 ml-1"
           >
             <X className="w-5 h-5" />
           </button>
@@ -228,48 +228,48 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
         <div className="flex-1 overflow-y-auto p-3.5 space-y-3.5">
           {/* Top Diagnostic Grid */}
           <div className="grid grid-cols-2 gap-2">
-            <div className="bg-[#121c2a] p-2.5 rounded-xl border border-slate-800 flex items-center space-x-2.5 min-w-0">
+            <div className="bg-surface-container-low dark:bg-[#121c2a] p-2.5 rounded-xl border border-surface-container-highest dark:border-slate-800 flex items-center space-x-2.5 min-w-0">
               <div className="p-2 rounded-lg bg-sky-500/10 text-sky-400 shrink-0">
                 <Signal className="w-4 h-4" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] text-slate-400 uppercase font-mono truncate">Signal Quality</p>
+                <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono truncate">Signal Quality</p>
                 <p className="text-xs font-bold text-sky-300 truncate">
                   {satelliteState?.signalStrength || 92}% (34.2 dB)
                 </p>
               </div>
             </div>
 
-            <div className="bg-[#121c2a] p-2.5 rounded-xl border border-slate-800 flex items-center space-x-2.5 min-w-0">
+            <div className="bg-surface-container-low dark:bg-[#121c2a] p-2.5 rounded-xl border border-surface-container-highest dark:border-slate-800 flex items-center space-x-2.5 min-w-0">
               <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 shrink-0">
                 <Battery className="w-4 h-4" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] text-slate-400 uppercase font-mono truncate">Module Battery</p>
+                <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono truncate">Module Battery</p>
                 <p className="text-xs font-bold text-emerald-300 truncate">
                   {satelliteState?.battery || 89}% (14h Active)
                 </p>
               </div>
             </div>
 
-            <div className="bg-[#121c2a] p-2.5 rounded-xl border border-slate-800 flex items-center space-x-2.5 min-w-0">
+            <div className="bg-surface-container-low dark:bg-[#121c2a] p-2.5 rounded-xl border border-surface-container-highest dark:border-slate-800 flex items-center space-x-2.5 min-w-0">
               <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 shrink-0">
                 <Compass className="w-4 h-4" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] text-slate-400 uppercase font-mono truncate">Antenna Aim</p>
+                <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono truncate">Antenna Aim</p>
                 <p className="text-xs font-bold text-amber-300 truncate">
                   Az: 128° • El: 54°
                 </p>
               </div>
             </div>
 
-            <div className="bg-[#121c2a] p-2.5 rounded-xl border border-slate-800 flex items-center space-x-2.5 min-w-0">
+            <div className="bg-surface-container-low dark:bg-[#121c2a] p-2.5 rounded-xl border border-surface-container-highest dark:border-slate-800 flex items-center space-x-2.5 min-w-0">
               <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 shrink-0">
                 <Cpu className="w-4 h-4" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] text-slate-400 uppercase font-mono truncate">Compression</p>
+                <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono truncate">Compression</p>
                 <p className="text-xs font-bold text-purple-300 truncate">
                   94% Saved
                 </p>
@@ -280,13 +280,13 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
           {/* Interactive Radar & Tracking Section */}
           <div className="flex flex-col gap-3">
             {/* Canvas Radar Visualizer */}
-            <div className="flex flex-col items-center bg-[#070b12] p-3 rounded-2xl border border-slate-800 relative">
+            <div className="flex flex-col items-center bg-surface-container-lowest dark:bg-[#070b12] p-3 rounded-2xl border border-surface-container-highest dark:border-slate-800 relative">
               <div className="w-full flex items-center justify-between mb-2">
                 <span className="text-[11px] font-mono text-sky-400 flex items-center space-x-1.5 truncate">
                   <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping shrink-0" />
                   <span className="truncate">LIVE ORBITAL RADAR (ISRO NavIC)</span>
                 </span>
-                <span className="text-[9px] font-mono text-slate-400 shrink-0 ml-1">
+                <span className="text-[9px] font-mono text-on-surface-variant dark:text-slate-400 shrink-0 ml-1">
                   28.6°N • 77.2°E
                 </span>
               </div>
@@ -316,7 +316,7 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
             </div>
 
             {/* Satellite Pass Telemetry */}
-            <div className="bg-[#0e1622] p-3 rounded-2xl border border-slate-800 space-y-2.5">
+            <div className="bg-surface-container-low dark:bg-[#0e1622] p-3 rounded-2xl border border-surface-container-highest dark:border-slate-800 space-y-2.5">
               <h3 className="font-bold text-xs text-white flex items-center justify-between">
                 <span>Selected Transponder</span>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono">
@@ -326,22 +326,22 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
 
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="p-2 bg-slate-900/80 rounded-xl border border-slate-800">
-                  <p className="text-[10px] text-slate-400 uppercase font-mono">Constellation ID</p>
+                  <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono">Constellation ID</p>
                   <p className="font-semibold text-sky-300 truncate">{currentSatObj.name}</p>
                 </div>
 
                 <div className="p-2 bg-slate-900/80 rounded-xl border border-slate-800">
-                  <p className="text-[10px] text-slate-400 uppercase font-mono">Frequency</p>
+                  <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono">Frequency</p>
                   <p className="font-semibold text-slate-200 truncate">{currentSatObj.freq}</p>
                 </div>
 
                 <div className="p-2 bg-slate-900/80 rounded-xl border border-slate-800">
-                  <p className="text-[10px] text-slate-400 uppercase font-mono">SNR</p>
+                  <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono">SNR</p>
                   <p className="font-bold text-emerald-400">{currentSatObj.snr}</p>
                 </div>
 
                 <div className="p-2 bg-slate-900/80 rounded-xl border border-slate-800">
-                  <p className="text-[10px] text-slate-400 uppercase font-mono">Bitrate</p>
+                  <p className="text-[10px] text-on-surface-variant dark:text-slate-400 uppercase font-mono">Bitrate</p>
                   <p className="font-bold text-white">2.4 kbps</p>
                 </div>
               </div>
@@ -353,7 +353,7 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
           </div>
 
           {/* Mode Switcher */}
-          <div className="bg-[#0e1622] p-3 rounded-2xl border border-slate-800 space-y-2.5">
+          <div className="bg-surface-container-low dark:bg-[#0e1622] p-3 rounded-2xl border border-surface-container-highest dark:border-slate-800 space-y-2.5">
             <h3 className="font-bold text-xs text-white">
               Transmission Routing Policy
             </h3>
@@ -364,14 +364,14 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
                 className={`p-2.5 rounded-xl border text-left transition-all ${
                   localMode === 'auto_hybrid'
                     ? 'bg-emerald-500/20 border-emerald-500/50 text-white'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    : 'bg-slate-900 border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <div className="flex items-center space-x-2 mb-0.5">
                   <div className={`w-2 h-2 rounded-full ${localMode === 'auto_hybrid' ? 'bg-emerald-400' : 'bg-slate-600'}`} />
                   <span className="font-bold text-xs text-white">Auto Hybrid (Recommended)</span>
                 </div>
-                <p className="text-[11px] text-slate-400 pl-4">
+                <p className="text-[11px] text-on-surface-variant dark:text-slate-400 pl-4">
                   Prioritizes 5G / Fiber; instantly falls back to Satellite module if off-grid.
                 </p>
               </button>
@@ -381,14 +381,14 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
                 className={`p-2.5 rounded-xl border text-left transition-all ${
                   localMode === 'satellite_only'
                     ? 'bg-sky-500/20 border-sky-500/50 text-white sat-glow'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    : 'bg-slate-900 border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <div className="flex items-center space-x-2 mb-0.5">
                   <div className={`w-2 h-2 rounded-full ${localMode === 'satellite_only' ? 'bg-sky-400' : 'bg-slate-600'}`} />
                   <span className="font-bold text-xs text-white">Pure Satellite Only</span>
                 </div>
-                <p className="text-[11px] text-slate-400 pl-4">
+                <p className="text-[11px] text-on-surface-variant dark:text-slate-400 pl-4">
                   Zero internet required. 100% data compressed & beamed directly to NavIC/GSAT.
                 </p>
               </button>
@@ -398,14 +398,14 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
                 className={`p-2.5 rounded-xl border text-left transition-all ${
                   localMode === 'internet_only'
                     ? 'bg-teal-500/20 border-teal-500/50 text-white'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    : 'bg-slate-900 border-slate-800 text-on-surface-variant dark:text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <div className="flex items-center space-x-2 mb-0.5">
                   <div className={`w-2 h-2 rounded-full ${localMode === 'internet_only' ? 'bg-teal-400' : 'bg-slate-600'}`} />
                   <span className="font-bold text-xs text-white">Standard Internet Only</span>
                 </div>
-                <p className="text-[11px] text-slate-400 pl-4">
+                <p className="text-[11px] text-on-surface-variant dark:text-slate-400 pl-4">
                   Uses Wi-Fi and Cellular broadband only. Satellite radio powers down.
                 </p>
               </button>
@@ -454,7 +454,7 @@ export const SatelliteConsoleModal: React.FC<SatelliteConsoleModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-3.5 py-2.5 bg-[#0e1622] border-t border-slate-800 flex items-center justify-between text-xs text-slate-400 shrink-0 gap-2">
+        <div className="px-3.5 py-2.5 bg-surface-container-low dark:bg-[#0e1622] border-t border-surface-container-highest dark:border-slate-800 flex items-center justify-between text-xs text-on-surface-variant dark:text-on-surface-variant dark:text-slate-400 shrink-0 gap-2">
           <div className="flex items-center space-x-1.5 min-w-0">
             <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
             <span className="truncate text-[11px] font-mono text-slate-300">NX-SAT-9912 (Active)</span>

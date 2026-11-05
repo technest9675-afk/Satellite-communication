@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Contact, CurrentUser, SatelliteModuleState } from '../types';
 import { sounds } from '../services/soundEffects';
 import { NexusLogo } from './NexusLogo';
+import { useTranslation } from '../services/i18n';
 
 interface SidebarProps {
   contacts: Contact[];
@@ -11,6 +12,8 @@ interface SidebarProps {
   satelliteState: SatelliteModuleState | null;
   onOpenSatelliteConsole: () => void;
   onOpenVault: () => void;
+  onOpenContactInfo?: (contact: Contact) => void;
+  onOpenProfile?: () => void;
   onOpenStatus: () => void;
   onOpenNewChat: () => void;
   onOpenAddContact?: () => void;
@@ -29,6 +32,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   satelliteState,
   onOpenSatelliteConsole,
   onOpenVault,
+  onOpenContactInfo,
+  onOpenProfile,
   onOpenStatus,
   onOpenNewChat,
   onOpenAddContact,
@@ -38,6 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   soundMuted,
   onToggleSound
 }) => {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [activeFilter, setActiveFilter] = useState<'all' | 'direct' | 'satellite' | 'dispatches'>('all');
@@ -76,7 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {currentUser?.role === 'admin' ? 'Admin' : 'Chats'}
                 </span>
               </div>
-              <p className="font-body-sm text-[11px] text-on-surface-variant truncate">Sovereign Mesh Chats</p>
+              <p className="font-body-sm text-[11px] text-on-surface-variant truncate">{t("brand_chats_sub", "Sovereign Mesh Chats")}</p>
             </div>
           </div>
 
@@ -108,7 +114,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
 
             {/* User Profile Avatar with Online Beacon */}
-            <div className="relative cursor-pointer shrink-0" onClick={onOpenVault} title="Security & Compliance Vault">
+            <div
+              className="relative cursor-pointer shrink-0 transition-transform active:scale-95 hover:opacity-90"
+              onClick={() => {
+                if (onOpenProfile) onOpenProfile();
+                else onOpenVault();
+                sounds.playClickSound();
+              }}
+              title="My Profile"
+            >
               <img
                 alt="User Profile"
                 className="w-8 h-8 rounded-full object-cover ring-1.5 ring-primary/40 bg-surface-container"
@@ -139,6 +153,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       type="button"
                       onClick={() => {
                         setIsMenuOpen(false);
+                        if (onOpenProfile) onOpenProfile();
+                        sounds.playClickSound();
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-on-surface hover:bg-surface-container-highest transition text-left"
+                    >
+                      <span className="material-symbols-outlined text-base text-primary">account_circle</span>
+                      <span className="font-medium">My Profile</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMenuOpen(false);
                         if (onOpenAddContact) onOpenAddContact();
                         else onOpenNewChat();
                         sounds.playClickSound();
@@ -146,7 +173,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-primary font-semibold hover:bg-surface-container-highest transition text-left"
                     >
                       <span className="material-symbols-outlined text-base text-primary">person_add</span>
-                      <span>Add New Contact</span>
+                      <span>{t("btn_add_contact", "Add New Contact")}</span>
                     </button>
 
                     <button
@@ -252,7 +279,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search chats, callsigns, or messages..."
+                placeholder={t("search_chats", "Search chats, callsigns, or messages...")}
                 autoFocus
                 className="w-full h-10 bg-surface-container-low rounded-xl pl-9 pr-8 text-xs text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container border border-surface-container-highest/60 transition-all font-sans"
               />
@@ -272,10 +299,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Segmented Filter Chips */}
         <div className="px-4 pb-2.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
           {[
-            { id: 'all', label: 'All Chats', count: contacts.length },
-            { id: 'direct', label: 'Direct', count: contacts.filter((c) => !c.isGroup).length },
-            { id: 'satellite', label: 'Satellite', count: contacts.filter((c) => c.satelliteLinked).length },
-            { id: 'dispatches', label: 'Groups', count: contacts.filter((c) => c.isGroup).length }
+            { id: 'all', label: t('filter_all_chats', 'All Chats'), count: contacts.length },
+            { id: 'direct', label: t('filter_direct', 'Direct'), count: contacts.filter((c) => !c.isGroup).length },
+            { id: 'satellite', label: t('filter_satellite', 'Satellite'), count: contacts.filter((c) => c.satelliteLinked).length },
+            { id: 'dispatches', label: t('filter_groups', 'Groups'), count: contacts.filter((c) => c.isGroup).length }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -329,12 +356,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     : 'hover:bg-surface-container-low/70'
                 }`}
               >
-                {/* Avatar with Online or Satellite Beacon */}
-                <div className="relative shrink-0">
+                {/* Avatar with Online or Satellite Beacon - Clicking Opens WhatsApp-Style Info Screen */}
+                <div
+                  className="relative shrink-0 cursor-pointer active:scale-95 transition-transform"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onOpenContactInfo) onOpenContactInfo(contact);
+                  }}
+                  title={contact.isGroup ? 'View Group Info' : 'View Contact Info'}
+                >
                   <img
                     src={contact.avatar}
                     alt={contact.name}
-                    className="w-12 h-12 rounded-full object-cover ring-1 ring-surface-container-highest"
+                    className="w-12 h-12 rounded-full object-cover ring-1 ring-surface-container-highest hover:ring-2 hover:ring-primary/60 transition-all"
                   />
                   {contact.online ? (
                     <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-primary ring-2 ring-surface" />

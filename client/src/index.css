@@ -11,33 +11,33 @@
   --color-surface-container-high: 241 245 249;
   --color-surface-container-highest: 226 232 240; /* #e2e8f0 */
   --color-surface-bright: 255 255 255;
-  --color-surface-variant: 226 232 240;
+  --color-surface-variant: 241 245 249;
   --color-on-surface: 15 23 42; /* #0f172a slate-900 */
   --color-on-surface-variant: 71 85 105; /* #475569 slate-600 */
   --color-outline: 148 163 184; /* #94a3b8 */
-  --color-outline-variant: 203 213 225;
+  --color-outline-variant: 226 232 240;
   --color-primary: 5 150 105; /* #059669 emerald-600 */
-  --color-primary-container: 16 185 129; /* #10b981 emerald-500 */
+  --color-primary-container: 209 250 229; /* #d1fae5 emerald-100: soft pastel mint */
   --color-on-primary: 255 255 255;
-  --color-on-primary-container: 6 78 59;
+  --color-on-primary-container: 6 78 59; /* #064e3b emerald-900: sharp contrast */
   --color-primary-fixed: 52 211 153;
   --color-primary-fixed-dim: 16 185 129;
   --color-secondary: 2 132 199; /* #0284c7 sky-600 */
-  --color-secondary-container: 14 165 233;
+  --color-secondary-container: 224 242 254; /* #e0f2fe sky-100: soft sky */
   --color-secondary-fixed: 186 230 253;
   --color-secondary-fixed-dim: 56 189 248;
   --color-on-secondary: 255 255 255;
-  --color-on-secondary-container: 12 74 96;
-  --color-tertiary: 217 119 6;
-  --color-tertiary-container: 245 158 11;
+  --color-on-secondary-container: 3 105 161; /* #0369a1 sky-700 */
+  --color-tertiary: 217 119 6; /* #d97706 amber-600 */
+  --color-tertiary-container: 254 243 199; /* #fef3c7 amber-100 */
   --color-tertiary-fixed: 254 243 199;
   --color-tertiary-fixed-dim: 252 211 77;
   --color-on-tertiary: 255 255 255;
-  --color-on-tertiary-container: 120 53 15;
-  --color-error: 220 38 38;
-  --color-error-container: 254 226 226;
+  --color-on-tertiary-container: 146 64 14; /* #92400e amber-800 */
+  --color-error: 220 38 38; /* #dc2626 red-600 */
+  --color-error-container: 254 226 226; /* #fee2e2 red-100 */
   --color-on-error: 255 255 255;
-  --color-on-error-container: 153 27 27;
+  --color-on-error-container: 153 27 27; /* #991b1b red-800 */
 }
 
 html.dark {
@@ -150,16 +150,29 @@ button svg {
 
 /* Tactical Glassmorphism & Glow styles */
 .glass-panel {
-  background: rgba(12, 20, 31, 0.85);
+  background: rgba(255, 255, 255, 0.90);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+}
+
+html.dark .glass-panel {
+  background: rgba(12, 20, 31, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-card {
-  background: rgba(25, 32, 44, 0.85);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+}
+
+html.dark .glass-card {
+  background: rgba(25, 32, 44, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
 }
 
 .sat-glow {

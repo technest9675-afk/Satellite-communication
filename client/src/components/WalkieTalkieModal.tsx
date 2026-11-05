@@ -61,42 +61,42 @@ export const WalkieTalkieModal: React.FC<WalkieTalkieModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in select-none">
-      <div className="bg-[#0b121a] border border-amber-500/40 rounded-3xl w-full max-w-[390px] max-h-[92dvh] overflow-y-auto no-scrollbar shadow-2xl flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/85 backdrop-blur-md animate-fade-in select-none">
+      <div className="bg-surface dark:bg-[#0b121a] text-on-surface border border-amber-500/40 rounded-3xl w-full max-w-[390px] max-h-[92dvh] overflow-y-auto no-scrollbar shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="px-5 py-3.5 bg-[#101824] border-b border-slate-800 flex items-center justify-between">
+        <div className="px-5 py-3.5 bg-surface-container-low dark:bg-[#101824] border-b border-surface-container-highest dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
             <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
               <Radio className="w-5 h-5 animate-pulse" />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-white flex items-center space-x-2">
+              <h3 className="font-bold text-sm text-on-surface dark:text-white flex items-center space-x-2">
                 <span>Satellite Walkie-Talkie (PTT)</span>
                 <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-mono">
                   S-Band Sub-GHz
                 </span>
               </h3>
-              <p className="text-[11px] text-slate-400">Half-Duplex Instant Radio Burst</p>
+              <p className="text-[11px] text-on-surface-variant dark:text-slate-400">Half-Duplex Instant Radio Burst</p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+            className="p-1.5 rounded-lg text-on-surface-variant dark:text-slate-400 hover:text-on-surface dark:hover:text-white hover:bg-surface-container-high dark:hover:bg-slate-800"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Channel Selector */}
-        <div className="p-4 bg-[#080d14] border-b border-slate-800/80">
+        <div className="p-4 bg-surface-container-lowest dark:bg-[#080d14] border-b border-surface-container-highest dark:border-slate-800/80">
           <label className="text-[10px] text-slate-400 uppercase font-mono block mb-1.5">
             Select Active Transponder Channel
           </label>
           <select
             value={selectedChannel}
             onChange={(e) => setSelectedChannel(e.target.value)}
-            className="w-full bg-[#131b26] text-xs font-semibold text-amber-400 p-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-amber-500"
+            className="w-full bg-surface-container dark:bg-[#131b26] text-xs font-semibold text-amber-700 dark:text-amber-400 p-2.5 rounded-xl border border-surface-container-highest dark:border-slate-700 focus:outline-none focus:border-amber-500"
           >
             {channels.map(ch => (
               <option key={ch.id} value={ch.name}>
@@ -107,7 +107,7 @@ export const WalkieTalkieModal: React.FC<WalkieTalkieModalProps> = ({
         </div>
 
         {/* Big PTT Tactical Center */}
-        <div className="p-8 flex flex-col items-center justify-center space-y-6 bg-gradient-to-b from-[#0b121a] to-[#070b12]">
+        <div className="p-8 flex flex-col items-center justify-center space-y-6 bg-surface-container-low dark:bg-gradient-to-b dark:from-[#0b121a] dark:to-[#070b12]">
           {/* Signal Indicator */}
           <div className="flex items-center space-x-4 text-xs font-mono text-slate-400">
             <span>SWR: 1.1:1 (TUNED)</span>

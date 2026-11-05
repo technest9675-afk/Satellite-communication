@@ -4,12 +4,14 @@ import { sounds } from '../services/soundEffects';
 import { EmergencyContactsModal } from './EmergencyContactsModal';
 import { QrCodeModal } from './QrCodeModal';
 import { NexusLogo } from './NexusLogo';
+import { useTranslation, LANGUAGE_OPTIONS } from '../services/i18n';
 
 interface SettingsViewProps {
   currentUser: CurrentUser | null;
   satelliteState: SatelliteModuleState | null;
   onLogout: () => void;
   onOpenVault: () => void;
+  onOpenProfile?: () => void;
   onOpenSatelliteConsole: () => void;
   onOpenSos: () => void;
 }
@@ -19,6 +21,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   satelliteState,
   onLogout,
   onOpenVault,
+  onOpenProfile,
   onOpenSatelliteConsole,
   onOpenSos
 }) => {
@@ -53,13 +56,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     return true;
   });
 
-  const [appLanguage, setAppLanguage] = useState(() => {
-    try {
-      return localStorage.getItem('nexus_language') || 'English (Default)';
-    } catch {
-      return 'English (Default)';
-    }
-  });
+  const { language, setLanguage, t } = useTranslation();
+  const currentLangOption = LANGUAGE_OPTIONS.find((l) => l.code === language) || LANGUAGE_OPTIONS[0];
 
   const [showLanguagePicker, setShowLanguagePicker] = useState(false);
   const [isEmergencyContactsOpen, setIsEmergencyContactsOpen] = useState(false);
@@ -160,7 +158,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           fallbackAlert,
           lowDataMode,
           notifications,
-          language: appLanguage,
+          language,
           theme: isDarkMode ? 'dark' : 'light'
         }
       };
@@ -194,14 +192,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     }
   };
 
-  const languages = [
-    'English (Default)',
-    'हिन्दी (Hindi)',
-    'தமிழ் (Tamil)',
-    'తెలుగు (Telugu)',
-    'বাংলা (Bengali)',
-    'मराठी (Marathi)'
-  ];
 
   return (
     <div className="flex-1 w-full flex flex-col bg-surface select-none overflow-y-auto no-scrollbar relative">
@@ -225,7 +215,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   SETTINGS
                 </span>
               </div>
-              <p className="font-body-sm text-[11px] text-on-surface-variant truncate">Settings &amp; Connectivity</p>
+              <p className="font-body-sm text-[11px] text-on-surface-variant truncate">{t('brand_settings_sub', 'Settings & Connectivity')}</p>
             </div>
           </div>
 
@@ -248,7 +238,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         {/* Personal Profile Card */}
         <section className="bg-surface-container rounded-2xl p-4 shadow-md border border-surface-container-high">
           <div className="flex items-center gap-3.5">
-            <div className="relative shrink-0">
+            <div
+              className={`relative shrink-0 ${onOpenProfile ? 'cursor-pointer transition-transform active:scale-95' : ''}`}
+              onClick={onOpenProfile}
+              title={onOpenProfile ? 'Edit Profile' : undefined}
+            >
               <img
                 alt="Avatar"
                 className="w-14 h-14 rounded-full object-cover shadow-sm ring-2 ring-primary/30"
@@ -259,7 +253,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-1">
-                <h2 className="font-semibold text-sm text-on-surface truncate">
+                <h2
+                  className={`font-semibold text-sm text-on-surface truncate ${onOpenProfile ? 'cursor-pointer hover:text-primary transition-colors' : ''}`}
+                  onClick={onOpenProfile}
+                >
                   {currentUser?.name || 'Nexus Operator'}
                 </h2>
                 <button
@@ -283,22 +280,30 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-surface-container-high">
+          <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-surface-container-high">
+            <button
+              type="button"
+              onClick={onOpenProfile}
+              className="flex items-center justify-center gap-1 py-2 px-1 rounded-lg bg-primary/15 hover:bg-primary/25 text-primary border border-primary/30 active:scale-98 transition shadow-xs"
+            >
+              <span className="material-symbols-outlined text-base">person</span>
+              <span className="text-xs font-semibold">Profile</span>
+            </button>
             <button
               type="button"
               onClick={onOpenVault}
-              className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface active:scale-98 transition"
+              className="flex items-center justify-center gap-1 py-2 px-1 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface active:scale-98 transition"
             >
               <span className="material-symbols-outlined text-base text-primary">security</span>
-              <span className="text-xs font-semibold">Security Vault</span>
+              <span className="text-xs font-semibold">Vault</span>
             </button>
             <button
               type="button"
               onClick={handleShareCallsign}
-              className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface active:scale-98 transition"
+              className="flex items-center justify-center gap-1 py-2 px-1 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface active:scale-98 transition"
             >
               <span className="material-symbols-outlined text-base text-secondary">share</span>
-              <span className="text-xs font-semibold">Share Callsign</span>
+              <span className="text-xs font-semibold">Callsign</span>
             </button>
           </div>
         </section>
@@ -307,7 +312,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         <section className="space-y-2">
           <div className="flex items-center justify-between px-1">
             <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-              Connectivity &amp; Network
+              {t('settings_section_network', 'Connectivity & Network')}
             </span>
             <span className="text-xs text-primary font-medium">Smart Mesh</span>
           </div>
@@ -324,8 +329,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   <span className="material-symbols-outlined text-xl">sync_alt</span>
                 </div>
                 <div className="text-left min-w-0">
-                  <div className="text-xs text-on-surface font-semibold truncate">Satellite &amp; Internet Routing</div>
-                  <div className="text-[11px] text-on-surface-variant truncate">Cellular, Wi-Fi &amp; Satellite auto-switch</div>
+                  <div className="text-xs text-on-surface font-semibold truncate">{t('settings_routing', 'Satellite & Internet Routing')}</div>
+                  <div className="text-[11px] text-on-surface-variant truncate">{t('settings_routing_desc', 'Cellular, Wi-Fi & Satellite auto-switch')}</div>
                 </div>
               </div>
               <span className="material-symbols-outlined text-on-surface-variant shrink-0">chevron_right</span>
@@ -342,7 +347,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   <span className="material-symbols-outlined text-xl">cell_tower</span>
                 </div>
                 <div className="text-left min-w-0">
-                  <div className="text-xs text-on-surface font-semibold truncate">Nexus Satellite Device</div>
+                  <div className="text-xs text-on-surface font-semibold truncate">{t('settings_device', 'Nexus Satellite Device')}</div>
                   <div className="text-[11px] text-secondary truncate">
                     {satelliteState?.hardwareConnected
                       ? `Connected • ${satelliteState.battery ?? 94}% Battery Remaining`
@@ -359,8 +364,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   <span className="material-symbols-outlined text-xl">vibration</span>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-xs text-on-surface font-medium truncate">Satellite Fallback Alert</div>
-                  <div className="text-[11px] text-on-surface-variant leading-tight">Haptic cue when signal switches</div>
+                  <div className="text-xs text-on-surface font-medium truncate">{t('settings_fallback', 'Satellite Fallback Alert')}</div>
+                  <div className="text-[11px] text-on-surface-variant leading-tight">{t('settings_fallback_desc', 'Haptic cue when signal switches')}</div>
                 </div>
               </div>
               <button
@@ -386,7 +391,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         <section className="space-y-2">
           <div className="flex items-center justify-between px-1">
             <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-              Privacy &amp; Security
+              {t('settings_section_privacy', 'Privacy & Security')}
             </span>
           </div>
 
@@ -402,7 +407,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   <span className="material-symbols-outlined text-xl">lock</span>
                 </div>
                 <div className="text-left min-w-0">
-                  <div className="text-xs text-on-surface font-semibold truncate">End-to-End Encryption</div>
+                  <div className="text-xs text-on-surface font-semibold truncate">{t('settings_e2ee', 'End-to-End Encryption')}</div>
                   <div className="text-[11px] text-primary truncate">Double-Ratchet + ASCON-128a Active</div>
                 </div>
               </div>
@@ -420,8 +425,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   <span className="material-symbols-outlined text-xl">contact_emergency</span>
                 </div>
                 <div className="text-left min-w-0">
-                  <div className="text-xs text-on-surface font-semibold truncate">Emergency Contacts &amp; SOS</div>
-                  <div className="text-[11px] text-on-surface-variant truncate">Configure trusted rescue nodes</div>
+                  <div className="text-xs text-on-surface font-semibold truncate">{t('settings_emergency_contacts', 'Emergency Contacts & SOS')}</div>
+                  <div className="text-[11px] text-on-surface-variant truncate">{t('settings_emergency_contacts_desc', 'Configure trusted rescue nodes')}</div>
                 </div>
               </div>
               <span className="material-symbols-outlined text-on-surface-variant shrink-0">chevron_right</span>
@@ -438,8 +443,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   <span className="material-symbols-outlined text-xl">mop</span>
                 </div>
                 <div className="text-left min-w-0">
-                  <div className="text-xs text-on-surface font-medium truncate">Clear Local Cache</div>
-                  <div className="text-[11px] text-on-surface-variant truncate">Purge offline temporary buffer</div>
+                  <div className="text-xs text-on-surface font-medium truncate">{t('settings_clear_cache', 'Clear Local Cache')}</div>
+                  <div className="text-[11px] text-on-surface-variant truncate">{t('settings_clear_cache_desc', 'Purge offline temporary buffer')}</div>
                 </div>
               </div>
               <span className="material-symbols-outlined text-on-surface-variant shrink-0">delete_sweep</span>
@@ -451,7 +456,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         <section className="space-y-2">
           <div className="flex items-center justify-between px-1">
             <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-              Appearance &amp; Theme
+              {t('settings_section_theme', 'Appearance & Theme')}
             </span>
           </div>
 
@@ -468,7 +473,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 }`}
               >
                 <span className="material-symbols-outlined text-base">dark_mode</span>
-                <span>Dark Mode</span>
+                <span>{t('settings_dark_mode', 'Dark Mode')}</span>
               </button>
 
               <button
@@ -481,7 +486,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 }`}
               >
                 <span className="material-symbols-outlined text-base">wb_sunny</span>
-                <span>Light Mode</span>
+                <span>{t('settings_light_mode', 'Light Mode')}</span>
               </button>
             </div>
 
@@ -491,8 +496,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   <span className="material-symbols-outlined text-xl">notifications_active</span>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-xs text-on-surface font-medium truncate">Sound Alerts &amp; Haptics</div>
-                  <div className="text-[11px] text-on-surface-variant leading-tight">Audible alert for satellite pings</div>
+                  <div className="text-xs text-on-surface font-medium truncate">{t('settings_sound_alerts', 'Sound Alerts & Haptics')}</div>
+                  <div className="text-[11px] text-on-surface-variant leading-tight">{t('settings_sound_desc', 'Audible alert for satellite pings')}</div>
                 </div>
               </div>
               <button
@@ -524,12 +529,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   <span className="material-symbols-outlined text-xl">language</span>
                 </div>
                 <div className="text-left min-w-0">
-                  <div className="text-xs text-on-surface font-semibold truncate">App Language</div>
-                  <div className="text-[11px] text-on-surface-variant truncate">Display script preference</div>
+                  <div className="text-xs text-on-surface font-semibold truncate">{t('settings_app_language', 'App Language')}</div>
+                  <div className="text-[11px] text-on-surface-variant truncate">{t('settings_language_desc', 'Display script preference')}</div>
                 </div>
               </div>
               <div className="flex items-center gap-1 shrink-0">
-                <span className="text-xs font-medium text-primary">{appLanguage}</span>
+                <span className="text-xs font-medium text-primary">{currentLangOption.name}</span>
                 <span className="material-symbols-outlined text-on-surface-variant">
                   {showLanguagePicker ? 'expand_less' : 'chevron_right'}
                 </span>
@@ -537,29 +542,29 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
 
             {showLanguagePicker && (
-              <div className="p-2 bg-surface-container-lowest rounded-xl border border-surface-container-highest/60 space-y-1">
-                {languages.map((lang) => (
+              <div className="p-2 bg-surface-container-lowest rounded-xl border border-surface-container-highest/60 space-y-1 animate-fade-in">
+                {LANGUAGE_OPTIONS.map((opt) => (
                   <button
-                    key={lang}
+                    key={opt.code}
                     type="button"
                     onClick={() => {
-                      setAppLanguage(lang);
-                      try {
-                        localStorage.setItem('nexus_language', lang);
-                      } catch {}
+                      setLanguage(opt.code);
                       setShowLanguagePicker(false);
                       sounds.playSentSound();
-                      showToast(`Language set to ${lang}`);
+                      showToast(`${t('settings_app_language', 'Language')}: ${opt.name}`);
                     }}
-                    className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between ${
-                      appLanguage === lang
-                        ? 'bg-primary/15 text-primary font-semibold'
+                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between transition-colors ${
+                      language === opt.code
+                        ? 'bg-primary/15 text-primary font-semibold shadow-xs'
                         : 'text-on-surface hover:bg-surface-container-high'
                     }`}
                   >
-                    <span>{lang}</span>
-                    {appLanguage === lang && (
-                      <span className="material-symbols-outlined text-sm">check</span>
+                    <div className="flex flex-col">
+                      <span className="font-semibold">{opt.name}</span>
+                      <span className="text-[10px] text-on-surface-variant font-mono">{opt.nativeName}</span>
+                    </div>
+                    {language === opt.code && (
+                      <span className="material-symbols-outlined text-sm text-primary font-bold">check</span>
                     )}
                   </button>
                 ))}
@@ -637,7 +642,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             className="w-full py-3 px-space-md rounded-xl bg-surface-container hover:bg-error-container/20 text-on-surface-variant hover:text-error flex items-center justify-center gap-2 transition active:scale-99 border border-surface-container-high shadow-sm"
           >
             <span className="material-symbols-outlined text-base">logout</span>
-            <span className="text-xs font-semibold uppercase tracking-wider">Logout Terminal Session</span>
+            <span className="text-xs font-semibold uppercase tracking-wider">{t('btn_sign_out', 'Logout Terminal Session')}</span>
           </button>
         </div>
       </main>

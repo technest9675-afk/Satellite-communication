@@ -59,6 +59,16 @@ export interface Message {
   };
 }
 
+export interface GroupMember {
+  id: string;
+  name: string;
+  avatar: string;
+  role: string;
+  phone?: string;
+  nexusId?: string;
+  isAdmin?: boolean;
+}
+
 export interface Contact {
   id: string;
   name: string;
@@ -78,6 +88,7 @@ export interface Contact {
   encryptionKey: string;
   about: string;
   publicKey?: string;
+  members?: GroupMember[];
 }
 
 export interface CurrentUser {
@@ -89,6 +100,7 @@ export interface CurrentUser {
   role: 'admin' | 'officer' | 'citizen' | 'suspended' | 'demo';
   status: string;
   avatar: string;
+  about?: string;
   state?: string;
   satelliteAccess?: boolean;
   verifiedBharat: boolean;

@@ -14,17 +14,19 @@ import { CallModal } from './components/CallModal';
 import { WalkieTalkieModal } from './components/WalkieTalkieModal';
 import { StatusModal } from './components/StatusModal';
 import { SecurityVaultModal } from './components/SecurityVaultModal';
+import { ProfileModal } from './components/ProfileModal';
 import { NewChatModal } from './components/NewChatModal';
 import { AdminPanelModal } from './components/AdminPanelModal';
+import { ContactInfoModal } from './components/ContactInfoModal';
 import { AuthScreen } from './components/AuthScreen';
 import { 
-  Contact, Message, CurrentUser, SatelliteModuleState, MessageMode 
+  Contact, Message, CurrentUser, SatelliteModuleState, MessageMode, GroupMember 
 } from './types';
 import { 
   fetchContacts, fetchMessages, 
   fetchSatelliteStatus, sendMessageApi, toggleMessageReaction, 
   toggleHardwareModule, socket, fetchCurrentUser, logoutApi, updateProfile, getAuthToken,
-  resetDemoDataApi 
+  resetDemoDataApi, addGroupMembers 
 } from './services/api';
 import { getOrCreateLocalIdentity, encryptMessagePayload } from './services/cryptoEngine';
 import { sounds } from './services/soundEffects';
@@ -58,9 +60,12 @@ export function App() {
   const [isWalkieTalkieOpen, setIsWalkieTalkieOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [isVaultModalOpen, setIsVaultModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
   const [newChatModalInitialTab, setNewChatModalInitialTab] = useState<'contacts' | 'add'>('contacts');
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
+  const [contactInfoTarget, setContactInfoTarget] = useState<Contact | null>(null);
+  const [isContactInfoOpen, setIsContactInfoOpen] = useState(false);
 
   const handleOpenAddContact = () => {
     setNewChatModalInitialTab('add');
@@ -71,6 +76,48 @@ export function App() {
     setNewChatModalInitialTab('contacts');
     setIsNewChatModalOpen(true);
   };
+
+  const handleOpenContactInfo = (contact: Contact) => {
+    setContactInfoTarget(contact);
+    setIsContactInfoOpen(true);
+  };
+
+  const handleAddGroupMembers = async (contactId: string, newMembers: GroupMember[]) => {
+    try {
+      const updated = await addGroupMembers(contactId, newMembers);
+      const finalMembers = (updated && updated.members) ? updated.members : newMembers;
+      setContacts((prev) =>
+        prev.map((c) => {
+          if (c.id === contactId) {
+            const existing = c.members || [];
+            const merged = [...existing];
+            for (const m of finalMembers) {
+              if (!merged.some((em) => em.id === m.id)) {
+                merged.push(m);
+              }
+            }
+            return { ...c, members: merged };
+          }
+          return c;
+        })
+      );
+      setContactInfoTarget((prev) => {
+        if (!prev || prev.id !== contactId) return prev;
+        const existing = prev.members || [];
+        const merged = [...existing];
+        for (const m of finalMembers) {
+          if (!merged.some((em) => em.id === m.id)) {
+            merged.push(m);
+          }
+        }
+        return { ...prev, members: merged };
+      });
+      sounds.playSentSound();
+    } catch (err) {
+      console.error('Failed to add group members:', err);
+    }
+  };
+
 
   // Validate server session on startup
   useEffect(() => {
@@ -204,6 +251,16 @@ export function App() {
       setContacts((prev) => [newContact, ...prev]);
     });
 
+    socket.on('group_members_updated', ({ contactId, members }: { contactId: string; members: GroupMember[] }) => {
+      setContacts((prev) =>
+        prev.map((c) => (c.id === contactId ? { ...c, members } : c))
+      );
+      setContactInfoTarget((prev) => {
+        if (!prev || prev.id !== contactId) return prev;
+        return { ...prev, members };
+      });
+    });
+
     socket.on('sos_triggered', () => {
       sounds.playSosAlert();
     });
@@ -214,6 +271,7 @@ export function App() {
       socket.off('satellite_status_changed');
       socket.off('satellite_hardware_changed');
       socket.off('contact_created');
+      socket.off('group_members_updated');
       socket.off('sos_triggered');
     };
   }, [activeContactId, currentUser]);
@@ -386,6 +444,7 @@ export function App() {
             onOpenWalkieTalkie={() => setIsWalkieTalkieOpen(true)}
             onOpenSos={() => setActiveTab('sos')}
             onOpenAddContact={handleOpenAddContact}
+            onOpenContactInfo={handleOpenContactInfo}
           />
         );
 
@@ -409,6 +468,7 @@ export function App() {
             satelliteState={satelliteState}
             onLogout={handleLogout}
             onOpenVault={() => setIsVaultModalOpen(true)}
+            onOpenProfile={() => setIsProfileModalOpen(true)}
             onOpenSatelliteConsole={() => setIsSatModalOpen(true)}
             onOpenSos={() => setActiveTab('sos')}
           />
@@ -445,6 +505,7 @@ export function App() {
                 onOpenVault={() => setIsVaultModalOpen(true)}
                 onConnectHardwareModule={handleConnectHardwareModule}
                 onBack={() => setShowMobileChat(false)}
+                onOpenContactInfo={handleOpenContactInfo}
                 isMobileChassis={true}
               />
             </div>
@@ -464,10 +525,12 @@ export function App() {
               satelliteState={satelliteState}
               onOpenSatelliteConsole={() => setIsSatModalOpen(true)}
               onOpenVault={() => setIsVaultModalOpen(true)}
+              onOpenProfile={() => setIsProfileModalOpen(true)}
               onOpenStatus={() => setIsStatusModalOpen(true)}
               onOpenNewChat={handleOpenNewChat}
               onOpenAddContact={handleOpenAddContact}
               onOpenWalkieTalkie={() => setIsWalkieTalkieOpen(true)}
+              onOpenContactInfo={handleOpenContactInfo}
               onOpenAdminPanel={() => setIsAdminPanelOpen(true)}
               onLogout={handleLogout}
               soundMuted={soundMuted}
@@ -486,10 +549,10 @@ export function App() {
     <MobileFrameWrapper satelliteState={satelliteState}>
       {/* DEMO MODE PERSISTENT NOTICE BANNER */}
         {currentUser?.role === 'demo' && (
-          <div className="w-full bg-gradient-to-r from-amber-500/20 via-amber-500/15 to-amber-500/20 border-b border-amber-500/40 px-3 py-1.5 flex items-center justify-between gap-1.5 z-40 text-amber-300 text-xs font-mono shrink-0 shadow-sm">
+          <div className="w-full bg-amber-500/15 dark:bg-gradient-to-r dark:from-amber-500/20 dark:via-amber-500/15 dark:to-amber-500/20 border-b border-amber-600/30 dark:border-amber-500/40 px-3 py-1.5 flex items-center justify-between gap-1.5 z-40 text-amber-950 dark:text-amber-300 text-xs font-mono shrink-0 shadow-sm">
             <div className="flex items-center gap-1.5 min-w-0">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
-              <span className="font-bold text-amber-400 tracking-wide text-[11px] truncate">
+              <span className="w-2 h-2 rounded-full bg-amber-600 dark:bg-amber-400 animate-pulse shrink-0" />
+              <span className="font-bold text-amber-900 dark:text-amber-400 tracking-wide text-[11px] truncate">
                 DEMO MODE • Isolated Sandbox
               </span>
             </div>
@@ -498,7 +561,7 @@ export function App() {
                 type="button"
                 disabled={isResettingDemo}
                 onClick={handleResetDemo}
-                className="h-6 px-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] font-semibold flex items-center gap-1 border border-amber-500/40 active:scale-95 transition-all"
+                className="h-6 px-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-950 dark:text-amber-300 text-[10px] font-semibold flex items-center gap-1 border border-amber-600/30 dark:border-amber-500/40 active:scale-95 transition-all"
                 title="Reset demo contacts and messages to initial sample state"
               >
                 <span className={`material-symbols-outlined text-[13px] ${isResettingDemo ? 'animate-spin' : ''}`}>
@@ -602,6 +665,60 @@ export function App() {
       <SecurityVaultModal
         isOpen={isVaultModalOpen}
         onClose={() => setIsVaultModalOpen(false)}
+      />
+
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        currentUser={currentUser}
+        satelliteState={satelliteState}
+        onUpdateProfile={async (data) => {
+          const updated = await updateProfile(data);
+          setCurrentUser(updated);
+          try {
+            localStorage.setItem('nexus_user', JSON.stringify(updated));
+          } catch {}
+        }}
+        onOpenVault={() => {
+          setIsProfileModalOpen(false);
+          setIsVaultModalOpen(true);
+        }}
+        onOpenSettings={() => {
+          setIsProfileModalOpen(false);
+          setActiveTab('settings');
+        }}
+        onLogout={handleLogout}
+      />
+
+      <ContactInfoModal
+        isOpen={isContactInfoOpen}
+        onClose={() => setIsContactInfoOpen(false)}
+        contact={contactInfoTarget}
+        allContacts={contacts}
+        onOpenChat={(c) => {
+          setIsContactInfoOpen(false);
+          setActiveContactId(c.id);
+          setShowMobileChat(true);
+          setActiveTab('chats');
+        }}
+        onStartVoiceCall={(c) => {
+          setIsContactInfoOpen(false);
+          setCallTargetContact(c);
+          setCallType('voice');
+          setIsCallModalOpen(true);
+        }}
+        onStartVideoCall={(c) => {
+          setIsContactInfoOpen(false);
+          setCallTargetContact(c);
+          setCallType('video');
+          setIsCallModalOpen(true);
+        }}
+        onOpenUpiPay={(c) => {
+          setIsContactInfoOpen(false);
+          setUpiTargetContact(c);
+          setIsUpiModalOpen(true);
+        }}
+        onAddMembers={handleAddGroupMembers}
       />
 
       <NewChatModal

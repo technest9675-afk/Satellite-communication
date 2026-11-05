@@ -154,17 +154,17 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in select-none">
-      <div className="bg-[#0b121c] border border-emerald-500/40 rounded-2xl sm:rounded-3xl w-full max-w-[390px] h-[92dvh] flex flex-col overflow-hidden shadow-2xl emerald-glow">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-black/60 dark:bg-black/85 backdrop-blur-md animate-fade-in select-none">
+      <div className="bg-surface dark:bg-[#0b121c] text-on-surface border border-emerald-500/40 rounded-2xl sm:rounded-3xl w-full max-w-[390px] h-[92dvh] flex flex-col overflow-hidden shadow-2xl emerald-glow">
         {/* Header */}
-        <div className="px-3.5 sm:px-6 py-3 sm:py-4 bg-[#0e1724] border-b border-slate-800 flex items-center justify-between shrink-0">
+        <div className="px-3.5 sm:px-6 py-3 sm:py-4 bg-surface-container-low dark:bg-[#0e1724] border-b border-surface-container-highest dark:border-slate-800 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-2.5 sm:space-x-3">
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-lg shrink-0">
               <Shield className="w-5 h-5" />
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                <h2 className="font-bold text-sm sm:text-base text-white">
+                <h2 className="font-bold text-sm sm:text-base text-on-surface dark:text-white">
                   Nexus Sovereign Network Administration
                 </h2>
                 <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -181,7 +181,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
             <button
               onClick={loadData}
               title="Refresh Telemetry"
-              className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="p-1.5 sm:p-2 rounded-xl text-on-surface-variant dark:text-slate-400 hover:text-on-surface dark:hover:text-white hover:bg-surface-container-high dark:hover:bg-slate-800 transition-colors"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-emerald-400' : ''}`} />
             </button>
@@ -207,7 +207,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
         )}
 
         {/* Tab Navigation */}
-        <div className="px-3.5 sm:px-6 pt-2 bg-[#0d1522] border-b border-slate-800 flex space-x-1 sm:space-x-4 overflow-x-auto no-scrollbar shrink-0 text-xs font-semibold">
+        <div className="px-3.5 sm:px-6 pt-2 bg-surface-container-lowest dark:bg-[#0d1522] border-b border-surface-container-highest dark:border-slate-800 flex space-x-1 sm:space-x-4 overflow-x-auto no-scrollbar shrink-0 text-xs font-semibold">
           {[
             { id: 'kpi', label: 'Network KPI Radar', icon: Activity },
             { id: 'users', label: 'Sovereign Users Directory', icon: Users },
@@ -242,25 +242,25 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
           {activeTab === 'kpi' && metrics && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-2.5">
-                <div className="p-3.5 rounded-2xl bg-[#0f1726] border border-slate-800 space-y-1">
+                <div className="p-3.5 rounded-2xl bg-surface-container-low dark:bg-[#0f1726] border border-surface-container-highest dark:border-slate-800 space-y-1">
                   <span className="text-[11px] font-mono text-slate-400 uppercase">Total Verified Nodes</span>
                   <p className="text-2xl font-bold text-white font-mono">{metrics.totalUsers}</p>
                   <span className="text-[10px] text-emerald-400 font-mono">100% Cryptographic Identity</span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#0f1726] border border-slate-800 space-y-1">
+                <div className="p-4 rounded-2xl bg-surface-container-low dark:bg-[#0f1726] border border-surface-container-highest dark:border-slate-800 space-y-1">
                   <span className="text-[11px] font-mono text-slate-400 uppercase">Active Nodes</span>
                   <p className="text-2xl font-bold text-emerald-400 font-mono">{metrics.activeUsers}</p>
                   <span className="text-[10px] text-emerald-400 font-mono">Authenticated Sessions</span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#0f1726] border border-slate-800 space-y-1">
+                <div className="p-4 rounded-2xl bg-surface-container-low dark:bg-[#0f1726] border border-surface-container-highest dark:border-slate-800 space-y-1">
                   <span className="text-[11px] font-mono text-slate-400 uppercase">Dispatched Envelopes</span>
                   <p className="text-2xl font-bold text-sky-400 font-mono">{metrics.totalMessages}</p>
                   <span className="text-[10px] text-slate-400 font-mono">{metrics.satelliteMessages} Satellite Burst</span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#0f1726] border border-slate-800 space-y-1">
+                <div className="p-4 rounded-2xl bg-surface-container-low dark:bg-[#0f1726] border border-surface-container-highest dark:border-slate-800 space-y-1">
                   <span className="text-[11px] font-mono text-slate-400 uppercase">Ground Relays</span>
                   <p className="text-2xl font-bold text-emerald-400 font-mono">{metrics.groundStationsOnline} / 6</p>
                   <span className="text-[10px] text-emerald-400 font-mono">ISRO Space Segment Sync</span>
@@ -306,9 +306,9 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                 </span>
               </div>
 
-              <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-[#0c131f]">
+              <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-surface-container-lowest dark:bg-[#0c131f]">
                 <table className="w-full text-left text-xs min-w-[700px]">
-                  <thead className="bg-[#101928] text-slate-400 uppercase font-mono text-[10px] border-b border-slate-800">
+                  <thead className="bg-surface-container-low dark:bg-[#101928] text-slate-400 uppercase font-mono text-[10px] border-b border-slate-800">
                     <tr>
                       <th className="p-3.5">User / Avatar</th>
                       <th className="p-3.5">Nexus ID</th>
@@ -497,7 +497,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
               </h3>
               <div className="flex flex-col gap-3">
                 {groundStations.map((station) => (
-                  <div key={station.id} className="p-4 rounded-2xl bg-[#0f1726] border border-slate-800 flex items-center justify-between">
+                  <div key={station.id} className="p-4 rounded-2xl bg-surface-container-low dark:bg-[#0f1726] border border-surface-container-highest dark:border-slate-800 flex items-center justify-between">
                     <div>
                       <div className="flex items-center space-x-2">
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
@@ -530,9 +530,9 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                 <span className="text-xs font-mono text-emerald-400">{auditLogs.length} events logged</span>
               </div>
 
-              <div className="rounded-2xl border border-slate-800 bg-[#0c131f] overflow-x-auto">
+              <div className="rounded-2xl border border-slate-800 bg-surface-container-lowest dark:bg-[#0c131f] overflow-x-auto">
                 <table className="w-full text-left text-xs min-w-[640px]">
-                  <thead className="bg-[#101928] text-slate-400 uppercase font-mono text-[10px] border-b border-slate-800">
+                  <thead className="bg-surface-container-low dark:bg-[#101928] text-slate-400 uppercase font-mono text-[10px] border-b border-slate-800">
                     <tr>
                       <th className="p-3">Timestamp (UTC)</th>
                       <th className="p-3">Event Type</th>
@@ -569,7 +569,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 bg-[#0e1724] border-t border-slate-800 flex items-center justify-between text-xs text-slate-400 shrink-0">
+        <div className="px-6 py-3 bg-surface-container-low dark:bg-[#0e1724] border-t border-surface-container-highest dark:border-slate-800 flex items-center justify-between text-xs text-slate-400 shrink-0">
           <span>Sovereign RBAC Protected • Role: {currentUser?.role}</span>
           <button
             onClick={onClose}

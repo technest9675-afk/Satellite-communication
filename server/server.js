@@ -240,6 +240,54 @@ const initialDemoContacts = [
     verifiedBharat: true,
     encryptionKey: 'Demo Sandbox Encryption',
     about: 'ISRO Telemetry Demo Gateway.'
+  },
+  {
+    id: 'demo_contact_sar_team',
+    name: 'SAR Rapid Response (Demo)',
+    role: 'Tactical SAR Group',
+    phone: '+91 00000 00004',
+    nexusId: 'NX-SIM-SAR-GROUP',
+    avatar: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=150',
+    online: true,
+    lastSeen: 'Active now',
+    satelliteLinked: true,
+    satelliteSignal: 95,
+    isGroup: true,
+    unreadCount: 0,
+    lastMessage: 'All units check in on 433.5MHz satellite relay.',
+    lastMessageTime: '18:50',
+    verifiedBharat: true,
+    encryptionKey: 'Demo Sandbox Encryption',
+    about: 'Emergency coordination group for simulated disaster drills.',
+    members: [
+      {
+        id: 'mem_demo_admin',
+        name: 'You (Demo Operator)',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+        role: 'Tactical Group Admin',
+        phone: '+91 99999 88888',
+        nexusId: 'NX-DEMO-ADMIN',
+        isAdmin: true
+      },
+      {
+        id: 'mem_demo_aarav',
+        name: 'Dr. Aarav (Demo Relay)',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+        role: 'NDRF Medical Lead',
+        phone: '+91 00000 00002',
+        nexusId: 'NX-SIM-AARAV',
+        isAdmin: false
+      },
+      {
+        id: 'mem_demo_isro',
+        name: 'ISRO NavIC Sim Hub',
+        avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150',
+        role: 'Orbital Transceiver',
+        phone: '+91 00000 00003',
+        nexusId: 'NX-SIM-NAVIC',
+        isAdmin: false
+      }
+    ]
   }
 ];
 
@@ -358,7 +406,13 @@ const initialContacts = [
     lastMessageTime: '17:45',
     verifiedBharat: true,
     encryptionKey: 'Group Sovereign Key',
-    about: 'Our sweet home group. Share photos, recipes and travel updates.'
+    about: 'Our sweet home group. Share photos, recipes and travel updates.',
+    members: [
+      { id: 'm1', name: 'Papa (Col. Rajesh)', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', role: 'Group Admin', phone: '+91 94120 55123', nexusId: 'NX-PAPA', isAdmin: true },
+      { id: 'm2', name: 'Maa', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150', role: 'Member', phone: '+91 98110 01240', nexusId: 'NX-MAA', isAdmin: false },
+      { id: 'm3', name: 'Rohan (Brother)', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', role: 'Member', phone: '+91 98220 01880', nexusId: 'NX-ROHAN', isAdmin: false },
+      { id: 'm4', name: 'Ananya (Sister)', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150', role: 'Member', phone: '+91 98330 01990', nexusId: 'NX-ANANYA', isAdmin: false }
+    ]
   },
   {
     id: 'contact_vikram',
@@ -1420,7 +1474,21 @@ app.get('/api/user/me', authenticateUser, (req, res) => {
 
 // Update Profile
 app.put('/api/user/me', authenticateUser, (req, res) => {
-  const { name, status, avatar, state, publicKey } = req.body;
+  const { name, status, avatar, state, publicKey, about } = req.body;
+
+  if (req.user.role === 'demo') {
+    if (name !== undefined) DEMO_USER.name = String(name).trim().slice(0, 60);
+    if (status !== undefined) DEMO_USER.status = String(status).trim().slice(0, 100);
+    if (avatar !== undefined) DEMO_USER.avatar = String(avatar).trim().slice(0, 5000000);
+    if (about !== undefined) DEMO_USER.about = String(about).trim().slice(0, 200);
+
+    Object.assign(req.user, DEMO_USER);
+    const storeUser = store.registeredUsers.find(u => u.id === req.user.id);
+    if (storeUser) {
+      Object.assign(storeUser, DEMO_USER);
+    }
+    return res.json(req.user);
+  }
 
   const userIdx = store.registeredUsers.findIndex(u => u.id === req.user.id);
   if (userIdx === -1) {
@@ -1430,8 +1498,9 @@ app.put('/api/user/me', authenticateUser, (req, res) => {
   const user = store.registeredUsers[userIdx];
   if (name !== undefined) user.name = String(name).trim().slice(0, 60);
   if (status !== undefined) user.status = String(status).trim().slice(0, 100);
-  if (avatar !== undefined) user.avatar = String(avatar).trim().slice(0, 500);
+  if (avatar !== undefined) user.avatar = String(avatar).trim().slice(0, 5000000);
   if (state !== undefined) user.state = String(state).trim().slice(0, 50);
+  if (about !== undefined) user.about = String(about).trim().slice(0, 200);
   if (publicKey !== undefined) user.publicKey = publicKey;
 
   const contactIdx = store.contacts.findIndex(c => c.id === user.id);
@@ -1708,7 +1777,8 @@ app.post('/api/contacts', authenticateUser, (req, res) => {
     lastMessageTime: 'Just now',
     verifiedBharat: true,
     encryptionKey: 'P-256 ECDH Authenticated',
-    about: req.body.about ? String(req.body.about).slice(0, 150) : 'Connected via Nexus Sovereign Network.'
+    about: req.body.about ? String(req.body.about).slice(0, 150) : 'Connected via Nexus Sovereign Network.',
+    members: Array.isArray(req.body.members) ? req.body.members : []
   };
 
   if (req.user.role === 'demo') {
@@ -1724,6 +1794,41 @@ app.post('/api/contacts', authenticateUser, (req, res) => {
 
   io.emit('contact_created', newContact);
   res.status(201).json(newContact);
+});
+
+// Add Members to Existing Group
+app.post('/api/contacts/:contactId/members', authenticateUser, (req, res) => {
+  const { contactId } = req.params;
+  const newMembers = Array.isArray(req.body.members)
+    ? req.body.members
+    : req.body.member ? [req.body.member] : [];
+
+  if (newMembers.length === 0) {
+    return res.status(400).json({ error: 'No members provided to add' });
+  }
+
+  const targetStore = req.user.role === 'demo' ? demoStore : store;
+  const group = targetStore.contacts.find(c => c.id === contactId);
+  if (!group) {
+    return res.status(404).json({ error: 'Group or contact not found' });
+  }
+
+  if (!Array.isArray(group.members)) {
+    group.members = [];
+  }
+
+  newMembers.forEach(m => {
+    if (!group.members.some(existing => existing.id === m.id || (existing.name === m.name && existing.phone === m.phone))) {
+      group.members.push(m);
+    }
+  });
+
+  if (req.user.role !== 'demo') {
+    saveStore(store);
+  }
+
+  io.emit('group_members_updated', { contactId, members: group.members });
+  res.json({ success: true, members: group.members, group });
 });
 
 app.get('/api/messages/:contactId', authenticateUser, (req, res) => {

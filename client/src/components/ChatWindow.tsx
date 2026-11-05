@@ -26,6 +26,7 @@ interface ChatWindowProps {
   onOpenWalkieTalkie: () => void;
   onOpenSatelliteConsole: () => void;
   onOpenVault: () => void;
+  onOpenContactInfo?: (contact: Contact) => void;
   onConnectHardwareModule: () => void;
   onBack: () => void;
   isMobileChassis?: boolean;
@@ -44,6 +45,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   onOpenWalkieTalkie,
   onOpenSatelliteConsole,
   onOpenVault,
+  onOpenContactInfo,
   onConnectHardwareModule,
   onBack,
   isMobileChassis = false
@@ -194,10 +196,17 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               <span className="material-symbols-outlined text-xl">arrow_back</span>
             </button>
 
-            <div className="relative shrink-0 cursor-pointer" onClick={onOpenVault}>
+            <div
+              className="relative shrink-0 cursor-pointer active:scale-95 transition-transform"
+              onClick={() => {
+                if (onOpenContactInfo) onOpenContactInfo(contact);
+                else onOpenVault();
+              }}
+              title={contact.isGroup ? 'View Group Info' : 'View Contact Info'}
+            >
               <img
                 alt={contact.name}
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover shadow-sm ring-1 ring-primary/30"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover shadow-sm ring-1 ring-primary/30 hover:ring-2 hover:ring-primary/60 transition-all"
                 src={contact.avatar}
               />
               {contact.online && (
@@ -205,9 +214,16 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               )}
             </div>
 
-            <div className="flex flex-col min-w-0 pl-0.5 sm:pl-1">
+            <div
+              className="flex flex-col min-w-0 pl-0.5 sm:pl-1 cursor-pointer"
+              onClick={() => {
+                if (onOpenContactInfo) onOpenContactInfo(contact);
+                else onOpenVault();
+              }}
+              title={contact.isGroup ? 'View Group Info' : 'View Contact Info'}
+            >
               <div className="flex items-center gap-1 sm:gap-1.5">
-                <h1 className="font-semibold text-xs sm:text-sm text-on-surface truncate leading-tight">
+                <h1 className="font-semibold text-xs sm:text-sm text-on-surface hover:text-primary transition-colors truncate leading-tight">
                   {contact.name}
                 </h1>
                 {contact.satelliteLinked && (
@@ -298,8 +314,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               <div
                 className={`rounded-2xl p-3 shadow-sm flex flex-col gap-1.5 border ${
                   isMe
-                    ? 'rounded-tr-sm bg-surface-container-high border-surface-container-highest/80 text-on-surface'
-                    : 'rounded-tl-sm bg-surface-container border-surface-container-high text-on-surface'
+                    ? 'rounded-tr-sm bg-emerald-50 dark:bg-primary/15 border-emerald-200 dark:border-primary/25 text-on-surface'
+                    : 'rounded-tl-sm bg-white dark:bg-surface-container border-slate-200/90 dark:border-surface-container-high text-on-surface'
                 }`}
               >
                 {/* Voice Note Player */}
@@ -416,7 +432,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               type="button"
               aria-label="Attach Options"
               onClick={() => setIsAttachOpen(!isAttachOpen)}
-              className="w-10 h-10 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-white flex items-center justify-center transition-colors active:scale-95"
+              className="w-10 h-10 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-colors active:scale-95"
             >
               <span className="material-symbols-outlined text-[20px]">add</span>
             </button>

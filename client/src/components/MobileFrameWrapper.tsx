@@ -31,12 +31,12 @@ export const MobileFrameWrapper: React.FC<MobileFrameWrapperProps> = ({
   const isSatActive = satelliteState?.mode === 'satellite_only' || satelliteState?.hardwareConnected;
 
   return (
-    <div className="w-full h-full min-h-[100dvh] bg-[#070b12] flex items-center justify-center select-none overflow-hidden p-0 sm:p-3">
+    <div className="w-full h-full min-h-[100dvh] bg-slate-200/90 dark:bg-[#070b12] flex items-center justify-center select-none overflow-hidden p-0 sm:p-3 transition-colors">
       {/* Sovereign Phone Frame Container (Strict 390x844 Dimension) */}
-      <div className="relative w-full max-w-[390px] h-full h-[100dvh] sm:h-[844px] sm:max-h-[92vh] bg-surface text-on-surface flex flex-col overflow-hidden sm:rounded-[48px] sm:border-[8px] sm:border-[#141d2b] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8),0_0_30px_rgba(0,229,163,0.08)] ring-1 ring-white/10">
+      <div className="relative w-full max-w-[390px] h-full h-[100dvh] sm:h-[844px] sm:max-h-[92vh] bg-surface text-on-surface flex flex-col overflow-hidden sm:rounded-[48px] sm:border-[8px] sm:border-slate-800 dark:sm:border-[#141d2b] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.4),0_0_30px_rgba(0,229,163,0.08)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8),0_0_30px_rgba(0,229,163,0.08)] ring-1 ring-slate-900/10 dark:ring-white/10">
         
         {/* iOS/Android Style Phone Status Bar */}
-        <div className="w-full h-11 px-6 pt-2 pb-1 bg-surface-dim/95 backdrop-blur-md flex items-center justify-between text-xs z-50 shrink-0 border-b border-surface-container-high/40">
+        <div className="w-full h-11 px-6 pt-2 pb-1 bg-surface-dim/95 backdrop-blur-md flex items-center justify-between text-xs z-50 shrink-0 border-b border-surface-container-high/60">
           {/* Time & Carrier */}
           <div className="flex items-center gap-1.5 min-w-[70px]">
             <span className="font-semibold text-xs text-on-surface tracking-tight">{currentTime}</span>
@@ -93,7 +93,7 @@ export const MobileFrameWrapper: React.FC<MobileFrameWrapperProps> = ({
 
         {/* Modern Home Indicator Pill */}
         <div className="w-full py-1.5 bg-surface-dim/95 backdrop-blur-md flex items-center justify-center shrink-0 z-20">
-          <div className="w-32 h-1 bg-white/35 rounded-full" />
+          <div className="w-32 h-1 bg-slate-400/80 dark:bg-white/35 rounded-full" />
         </div>
       </div>
     </div>

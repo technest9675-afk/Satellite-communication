@@ -66,28 +66,28 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in select-none">
-      <div className="bg-[#0e1622] border border-emerald-500/40 rounded-3xl w-full max-w-[390px] max-h-[92dvh] overflow-y-auto no-scrollbar shadow-2xl emerald-glow flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-md animate-fade-in select-none">
+      <div className="bg-surface dark:bg-[#0e1622] text-on-surface border border-emerald-500/40 rounded-3xl w-full max-w-[390px] max-h-[92dvh] overflow-y-auto no-scrollbar shadow-2xl emerald-glow flex flex-col">
         {/* Top Header */}
-        <div className="px-5 py-4 bg-[#121c2b] border-b border-slate-800 flex items-center justify-between">
+        <div className="px-5 py-4 bg-surface-container-low dark:bg-[#121c2b] border-b border-surface-container-highest dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
             <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
               <IndianRupee className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-white flex items-center space-x-1.5">
+              <h3 className="font-bold text-sm text-on-surface dark:text-white flex items-center space-x-1.5">
                 <span>Nexus UPI RuPay PayChat</span>
                 <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 font-mono">
                   NPCI 2.0
                 </span>
               </h3>
-              <p className="text-[11px] text-slate-400">Zero-Fee Sovereign Real-Time Settlement</p>
+              <p className="text-[11px] text-on-surface-variant dark:text-slate-400">Zero-Fee Sovereign Real-Time Settlement</p>
             </div>
           </div>
 
           <button
             onClick={handleClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+            className="p-1.5 rounded-lg text-on-surface-variant dark:text-slate-400 hover:text-on-surface dark:hover:text-white hover:bg-surface-container-high dark:hover:bg-slate-800"
           >
             <X className="w-4 h-4" />
           </button>
@@ -97,15 +97,15 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
         {step === 'amount' && (
           <div className="p-6 space-y-5">
             {/* Beneficiary Pill */}
-            <div className="flex items-center space-x-3 p-3 bg-slate-900/80 rounded-2xl border border-slate-800">
+            <div className="flex items-center space-x-3 p-3 bg-surface-container-low dark:bg-slate-900/80 rounded-2xl border border-surface-container-highest dark:border-slate-800">
               <img
                 src={contact.avatar}
                 alt={contact.name}
                 className="w-11 h-11 rounded-full object-cover border border-emerald-500/40"
               />
               <div className="min-w-0">
-                <p className="text-[11px] text-slate-400">Paying to</p>
-                <h4 className="font-bold text-sm text-white truncate">{contact.name}</h4>
+                <p className="text-[11px] text-on-surface-variant dark:text-slate-400">Paying to</p>
+                <h4 className="font-bold text-sm text-on-surface dark:text-white truncate">{contact.name}</h4>
                 <p className="text-[11px] text-emerald-400 font-mono truncate">
                   {contact.phone ? contact.phone.replace(/\s+/g, '') + '@nexuspay' : 'recipient@okhdfcbank'}
                 </p>
@@ -156,7 +156,7 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
                 placeholder="What is this for?"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                className="w-full bg-[#141d2a] text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-emerald-500"
+                className="w-full bg-surface-container-lowest dark:bg-[#141d2a] text-sm text-on-surface dark:text-white px-3.5 py-2.5 rounded-xl border border-surface-container-highest dark:border-slate-700 focus:outline-none focus:border-emerald-500"
               />
             </div>
 
@@ -274,7 +274,7 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
         )}
 
         {/* Footer */}
-        <div className="px-5 py-2.5 bg-[#0b111a] border-t border-slate-800/80 flex items-center justify-center space-x-1.5 text-[10px] text-slate-400">
+        <div className="px-5 py-2.5 bg-surface-container-lowest dark:bg-[#0b111a] border-t border-surface-container-highest dark:border-slate-800/80 flex items-center justify-center space-x-1.5 text-[10px] text-slate-400">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
           <span>Government of India & RBI Approved Sovereign Payment Rail</span>
         </div>

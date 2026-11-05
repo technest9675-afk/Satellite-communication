@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 import { 
-  Message, Contact, CurrentUser, SatelliteModuleState, UpiDetails, AdminMetrics, GroundStation 
+  Message, Contact, CurrentUser, SatelliteModuleState, UpiDetails, AdminMetrics, GroundStation, GroupMember 
 } from '../types';
 
 const TOKEN_KEY = 'nexus_auth_token';
@@ -321,6 +321,16 @@ export async function createContact(data: Partial<Contact>): Promise<Contact> {
     body: JSON.stringify(data)
   });
   if (!res.ok) throw new Error('Failed to create contact');
+  return res.json();
+}
+
+export async function addGroupMembers(contactId: string, members: GroupMember[]): Promise<{ success: boolean; members: GroupMember[]; group: Contact }> {
+  const res = await fetch(`/api/contacts/${encodeURIComponent(contactId)}/members`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ members })
+  });
+  if (!res.ok) throw new Error('Failed to add group members');
   return res.json();
 }
 

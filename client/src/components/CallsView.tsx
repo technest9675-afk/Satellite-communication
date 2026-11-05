@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Contact, CurrentUser } from '../types';
 import { sounds } from '../services/soundEffects';
 import { NexusLogo } from './NexusLogo';
+import { useTranslation } from '../services/i18n';
 
 interface CallsViewProps {
   contacts: Contact[];
@@ -11,6 +12,7 @@ interface CallsViewProps {
   onOpenWalkieTalkie: () => void;
   onOpenSos: () => void;
   onOpenAddContact?: () => void;
+  onOpenContactInfo?: (contact: Contact) => void;
 }
 
 interface CallRecord {
@@ -38,8 +40,10 @@ export const CallsView: React.FC<CallsViewProps> = ({
   onStartVideoCall,
   onOpenWalkieTalkie,
   onOpenSos,
-  onOpenAddContact
+  onOpenAddContact,
+  onOpenContactInfo
 }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'all' | 'missed'>('all');
   const [selectedCallType, setSelectedCallType] = useState<'voice' | 'video' | null>(null);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -252,7 +256,7 @@ export const CallsView: React.FC<CallsViewProps> = ({
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
-            Recent Calls
+            {t('filter_all_calls', 'Recent Calls')}
           </button>
           <button
             type="button"
@@ -263,31 +267,66 @@ export const CallsView: React.FC<CallsViewProps> = ({
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
-            Missed
+            {t('filter_missed_calls', 'Missed')}
           </button>
         </div>
 
         {/* Call Log List or Empty State */}
         {filteredCalls.length > 0 ? (
           <div className="flex flex-col divide-y divide-surface-container-high/60 bg-surface-container rounded-2xl border border-surface-container-high overflow-hidden shadow-md">
-            {filteredCalls.map((call) => (
+            {filteredCalls.map((call) => {
+              const matchedContact: Contact = contacts.find((c) => c.id === call.contact?.id || c.name === call.contact?.name) || {
+                id: call.contact?.id || `call-${call.id}`,
+                name: call.contact?.name || 'Contact',
+                role: 'Field Operator',
+                avatar: call.contact?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+                nexusId: call.contact?.nexusId || 'NX-CONTACT',
+                phone: call.contact?.phone || '+91 98765 43210',
+                online: false,
+                lastSeen: call.timestamp,
+                unreadCount: 0,
+                satelliteLinked: call.mode === 'satellite',
+                satelliteSignal: call.mode === 'satellite' ? 88 : 0,
+                isGroup: false,
+                lastMessage: '',
+                lastMessageTime: call.timestamp,
+                verifiedBharat: true,
+                encryptionKey: 'NIST-P256-CURVE',
+                about: 'NEXUS Network Operator'
+              };
+
+              return (
               <div key={call.id} className="p-3.5 flex items-center justify-between gap-3 hover:bg-surface-container-high/60 transition-colors">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="relative shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      sounds.playClickSound();
+                      onOpenContactInfo?.(matchedContact);
+                    }}
+                    title="View Contact Profile"
+                    className="relative shrink-0 text-left active:scale-95 transition-transform"
+                  >
                     <img
                       alt={call.contact?.name || 'Contact'}
                       src={call.contact?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
-                      className="w-11 h-11 rounded-2xl object-cover ring-1 ring-surface-container-highest"
+                      className="w-11 h-11 rounded-2xl object-cover ring-1 ring-surface-container-highest hover:ring-primary transition-all"
                     />
                     <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary text-[10px] border border-surface-container-high">
                       <span className="material-symbols-outlined text-[10px]">
                         {call.direction === 'missed' ? 'call_missed' : call.direction === 'incoming' ? 'call_received' : 'call_made'}
                       </span>
                     </span>
-                  </div>
+                  </button>
 
                   <div className="flex flex-col min-w-0">
-                    <span className="font-semibold text-xs text-on-surface truncate">
+                    <span 
+                      onClick={() => {
+                        sounds.playClickSound();
+                        onOpenContactInfo?.(matchedContact);
+                      }}
+                      className="font-semibold text-xs text-on-surface truncate cursor-pointer hover:text-primary transition-colors"
+                    >
                       {call.contact?.name || 'Contact'}
                     </span>
                     <div className="flex items-center gap-1.5 text-[11px] text-on-surface-variant mt-0.5">
@@ -329,7 +368,7 @@ export const CallsView: React.FC<CallsViewProps> = ({
                   </button>
                 </div>
               </div>
-            ))}
+            );})}
           </div>
         ) : (
           <div className="py-12 px-4 flex flex-col items-center justify-center text-center space-y-3 bg-surface-container/50 rounded-2xl border border-surface-container-high/60">
