@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NEXUS optical link — virtual bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#e9edf0; --panel:#f7f9fa; --panel2:#eef2f4; --ink:#101c24; --mute:#5c6c77; --line:#c3cdd4;
+  --sky:#dbe6ec; --earth:#b7c8d0; --beam:#b23a12; --ok:#2f7d4f; --bad:#b23a12; --amber:#a8641b; --teal:#0d6d7a;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace; --sans:"IBM Plex Sans",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0b1216; --panel:#121e24; --panel2:#16242b; --ink:#dde7ed; --mute:#8fa2ad; --line:#27363f;
+  --sky:#0d1a22; --earth:#1b2c35; --beam:#f07a4e; --ok:#68c48d; --bad:#f07a4e; --amber:#e0a34f; --teal:#4cc0cf;
+}}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font:15px/1.55 var(--sans);
+  background:radial-gradient(1100px 520px at 15% -10%, rgba(13,109,122,.07), transparent 60%),
+             radial-gradient(900px 480px at 90% 0%, rgba(178,58,18,.06), transparent 55%), var(--bg);}
+main{max-width:1160px;margin:0 auto;padding:26px 18px 60px}
+.kicker{font:500 11.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--mute);display:flex;gap:14px;flex-wrap:wrap}
+.kicker b{color:var(--beam);font-weight:600}
+h1{font-size:clamp(27px,4.6vw,42px);line-height:1.05;margin:12px 0 8px;font-weight:600;letter-spacing:-.022em}
+h1 em{font-style:normal;color:var(--teal)}
+.sub{color:var(--mute);max-width:72ch;margin:0;font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0 14px}
+.chip{font:500 12px/1 var(--mono);border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:7px 12px;color:var(--mute)}
+.chip b{color:var(--ink);font-weight:600}
+.chip.good b{color:var(--ok)}.chip.bad b{color:var(--bad)}
+canvas#scene{width:100%;height:290px;display:block;border:1px solid var(--line);border-radius:12px;background:var(--sky)}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px 22px;margin:16px 0 6px;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+label{display:block;font:500 11px/1.6 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--mute)}
+label output{float:right;color:var(--ink);letter-spacing:0;text-transform:none;font-weight:500}
+input[type=range]{width:100%;accent-color:var(--teal);margin-top:6px}
+select,input[type=text]{font:inherit;font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:7px 9px;width:100%;margin-top:5px}
+button{font:500 13.5px var(--sans);cursor:pointer;border-radius:7px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);padding:9px 15px;transition:opacity .15s}
+button:hover{opacity:.88}
+button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:16px}
+.card{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:14px 16px}
+.card h2{margin:0 0 10px;font:600 11px var(--mono);letter-spacing:.13em;text-transform:uppercase;color:var(--mute);display:flex;justify-content:space-between;gap:10px}
+.card h2 span{color:var(--ink);letter-spacing:0;text-transform:none;font:500 12px var(--mono)}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13.5px}
+dt{color:var(--mute)}dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.bar{height:8px;background:var(--line);border-radius:5px;overflow:hidden;margin:10px 0 4px}
+.bar i{display:block;height:100%;background:var(--ok);width:50%;transition:width .3s,background .3s}
+.row{display:flex;gap:8px;margin-top:10px}
+#sos{width:54px;height:54px;border-radius:50%;background:var(--bad);border-color:var(--bad);color:#fff;font-size:12px;flex:none;padding:0}
+.budget{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media(max-width:760px){.budget{grid-template-columns:1fr}}
+.term{display:grid;grid-template-columns:1fr 74px;gap:8px;font:12.5px var(--mono);padding:3px 0;border-bottom:1px dashed var(--line);align-items:center}
+.term:last-child{border-bottom:0;font-weight:600}
+.term span:last-child{text-align:right}
+.term>span:first-child{color:var(--ink)}
+.term>span:last-child{font-variant-numeric:tabular-nums}
+.neg{color:var(--bad)}
+h3.sec{font:600 12px var(--mono);letter-spacing:.13em;text-transform:uppercase;color:var(--mute);margin:30px 0 10px;display:flex;align-items:center;gap:10px}
+h3.sec::after{content:"";flex:1;height:1px;background:var(--line)}
+#scope{width:100%;height:110px;display:block;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+#log{height:250px;overflow:auto;margin-top:14px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);font:12.5px/1.6 var(--mono)}
+#log div{white-space:pre-wrap;word-break:break-word}
+.tA{color:var(--teal)}.tS{color:var(--amber)}.tB{color:var(--ok)}.tE{color:var(--bad)}.tN{color:var(--mute)}
+details{margin-top:16px;border:1px solid var(--line);border-radius:10px;padding:12px 16px;background:var(--panel)}
+summary{cursor:pointer;font-weight:600;font-size:14px}
+details p{margin:10px 0 0;color:var(--mute);font-size:13.5px}
+code{font:12px var(--mono);background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:1px 4px}
+.note{color:var(--mute);font-size:12.5px;margin-top:12px;max-width:82ch}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+th,td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line)}
+th{font:500 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+</style></head>
+<body><main>
+
+<div class="kicker"><b>NEXUS</b><span>SFIC 2026 · PS0001 · TM002829</span><span>Optical link bench</span></div>
+<h1>Virtual bench: <em>16-PPM</em> store-and-forward link</h1>
+<p class="sub">The same logic the hardware runs — 16-PPM symbols, Hamming(7,4) with a 4×7 interleaver, CRC-32, TTL, NACKs and the transit-buffer wipe — against a real link budget. Send a message from module A to module B and watch every stage it passes.</p>
+
+<div class="chips">
+  <span class="chip" id="cNode">Relay <b>—</b></span>
+  <span class="chip" id="cUp">Uplink <b>—</b></span>
+  <span class="chip" id="cDown">Downlink <b>—</b></span>
+  <span class="chip">Latency <b id="cLat">—</b></span>
+  <span class="chip">Frame, 30 B <b id="cAir">—</b></span>
+</div>
+
+<canvas id="scene" role="img" aria-label="Module A, relay node and module B with laser links"></canvas>
+
+<div class="ctl">
+  <label>Scenario
+    <select id="mode">
+      <option value="roof">Phase 1 · rooftop relay, 300 m</option>
+      <option value="geo" selected>Phase 2 · GEO relay, 36,000 km</option>
+    </select>
+  </label>
+  <label>Ground site
+    <select id="site">
+      <option value="rajkot" selected>Rajkot · 63.6° el</option>
+      <option value="leh">Leh · 50.1° el</option>
+      <option value="kanyakumari">Kanyakumari · 79.6° el</option>
+      <option value="itanagar">Itanagar · 51.6° el</option>
+      <option value="portblair">Port Blair · 64.3° el</option>
+    </select>
+  </label>
+  <label>Module laser <output id="oPw"></output><input id="pw" type="range" min="0" max="4" value="4" step="1"></label>
+  <label>Beam divergence <output id="oDiv"></output><input id="div" type="range" min="25" max="1000" value="60" step="5"></label>
+  <label>Pointing error <output id="oPt"></output><input id="pt" type="range" min="0" max="60" value="6" step="1"></label>
+  <label>Slot rate (SLOT_DIV)<select id="slot">
+    <option value="2">2 · 2057 kbit/s</option>
+    <option value="36" selected>36 · 114.3 kbit/s</option>
+    <option value="72">72 · 57.1 kbit/s</option>
+    <option value="720">720 · 5.7 kbit/s</option>
+  </select></label>
+  <label>Sun on the satellite<select id="sun"><option value="1" selected>Sunlit</option><option value="0">Eclipse</option></select></label>
+  <div style="display:flex;gap:8px;align-items:flex-end">
+    <button class="ghost" id="fault1" title="Corrupt one PPM symbol">Bad pulse ×1</button>
+    <button class="ghost" id="fault2" title="Corrupt two symbols in one block">Bad pulse ×2</button>
+  </div>
+</div>
+
+<div class="cols">
+  <section class="card"><h2>Module A <span id="aSt">idle</span></h2>
+    <dl><dt>Queue</dt><dd id="aQ">0</dd><dt>Last ACK</dt><dd id="aAck">—</dd><dt>Retries</dt><dd id="aRet">0</dd><dt>TX power</dt><dd id="aPw">—</dd></dl>
+    <div class="row"><input id="msg" type="text" value="Cable bridge out at Kotda" maxlength="40" aria-label="Message"><button id="send">Send</button></div>
+    <div class="row" style="align-items:center"><button id="sos" aria-label="SOS">SOS</button><span style="color:var(--mute);font-size:12.5px">Retries four times with the position attached until module B acknowledges.</span></div>
+  </section>
+
+  <section class="card"><h2>Relay node <span id="sSt">idle</span></h2>
+    <dl><dt>Transit buffer</dt><dd id="sBuf">wiped</dd><dt>FEC corrected</dt><dd id="sFec">0 bits</dd><dt>Forwarded</dt><dd id="sFwd">0</dd><dt>Dropped</dt><dd id="sDrp">0</dd><dt>Battery</dt><dd id="sBat">—</dd><dt>Load</dt><dd id="sLoad">—</dd></dl>
+    <div class="bar"><i id="soc"></i></div>
+  </section>
+
+  <section class="card"><h2>Module B <span id="bSt">idle</span></h2>
+    <dl><dt>Delivered</dt><dd id="bRx">0</dd><dt>CRC errors</dt><dd id="bCrc">0</dd><dt>Last message</dt><dd id="bMsg">—</dd><dt>RSSI</dt><dd id="bRssi">—</dd></dl>
+  </section>
+</div>
+
+<h3 class="sec">Link budget</h3>
+<div class="budget">
+  <div class="card"><h2>Uplink · module to relay</h2><div id="upTerms"></div>
+    <dl style="margin-top:10px"><dt>Received power</dt><dd id="upPrx">—</dd><dt>Sensitivity at this slot rate</dt><dd id="upSens">—</dd><dt>Margin</dt><dd id="upMar">—</dd></dl></div>
+  <div class="card"><h2>Downlink · relay to module</h2><div id="dnTerms"></div>
+    <dl style="margin-top:10px"><dt>Received power</dt><dd id="dnPrx">—</dd><dt>Sensitivity at this slot rate</dt><dd id="dnSens">—</dd><dt>Margin</dt><dd id="dnMar">—</dd></dl></div>
+</div>
+
+<h3 class="sec">On the wire · 16-PPM symbols</h3>
+<canvas id="scope" role="img" aria-label="PPM slot waveform"></canvas>
+<p class="note" id="scopeNote">One pulse per 20 slots: 16 data slots, 4 guard. Hamming(7,4) codewords are interleaved across 7 symbols, so a single wrong pulse damages at most one bit of each codeword.</p>
+
+<div id="log" role="log" aria-label="Serial monitor"></div>
+
+<details><summary>What the model runs, and where the numbers come from</summary>
+<table>
+<tr><th>Stage</th><th>Rule used here</th><th>Source in the design</th></tr>
+<tr><td>Symbol</td><td>16-PPM, 20 slots, 1 pulse</td><td><code>nexus_defs.vh</code> PPM_M, SLOTS_SYM</td></tr>
+<tr><td>FEC</td><td>Hamming(7,4), 4×7 interleave, 2 bytes → 7 symbols</td><td><code>enc_block</code> / <code>dec_block</code></td></tr>
+<tr><td>Frame</td><td>VER TYPE TTL DST[8] SRC[8] SEQ[2] PAY CRC-32</td><td>link frame comment in <code>nexus_defs.vh</code></td></tr>
+<tr><td>Receiver</td><td>PIN + OPA858 TIA noise model, SER 1e-3, +2 dB implementation loss</td><td><code>analysis/link_budget.py</code></td></tr>
+<tr><td>Beam</td><td>Gaussian, gain 32/θ², pointing loss exp(−8e²/θ²)</td><td><code>gauss_gain</code>, <code>pointing_loss</code></td></tr>
+<tr><td>Geometry</td><td>GEO at 74° E, slant range and delay per site</td><td><code>geo_view()</code></td></tr>
+<tr><td>Power</td><td>Idle 1.07 W, active 1.16 W, 20 W panel, 6 Ah pack</td><td><code>power_budget.txt</code></td></tr>
+</table>
+<p>Every number on this page is computed live in the browser from those rules. Nothing is a lookup table of canned results.</p>
+</details>
+
+<p class="note">A simulation, not a certification. Real GEO links also need a licence for the slot, atmospheric compensation on the uplink, and a pointing budget measured on hardware — the design package treats all three as Phase 2 work.</p>
+</main>
+
+<script>
+/* NEXUS link model — same numbers as analysis/link_budget.py and the RTL.
+   Tested in node: node bench_model.test.js */
+const F_SYS = 36e6, PPM_M = 16, GUARD = 4, FEC = 4 / 7, Z = 3.808;
+const QE = 1.602176634e-19, KB = 1.380649e-23, TEMP = 300, LAM = 1550e-9;
+const CT = 6.8e-12, GBW = 5.5e9, EN = 2.5e-9, IDARK = 0.5e-9, RFMAX = 10e6, CFMIN = 0.1e-12, RESP = 0.95;
+const IMPL = 2.0;
+
+/* PIN + OPA858 transimpedance sensitivity, average power for SER 1e-3 */
+function rxSens(dbmBg, slotDiv) {
+  const ts = slotDiv / F_SYS, b = 1 / (2 * ts), f = 0.7 / ts;
+  const rf = Math.min(RFMAX, GBW / (2 * Math.PI * CT * f * f), 1 / (2 * Math.PI * CFMIN * f));
+  const pbg = Math.pow(10, dbmBg / 10) * 1e-3;
+  const white = 4 * KB * TEMP / rf + 2 * QE * (IDARK + RESP * pbg);
+  const enc = Math.pow(2 * Math.PI * EN * CT, 2) * Math.pow(b, 3) / 3;
+  const s0 = Math.sqrt(white * b + enc);
+  const kappa = 2 * QE * b;
+  const mu = (Z * Z * kappa + Math.sqrt(Math.pow(Z * Z * kappa, 2) + 8 * Z * Z * s0 * s0)) / 2;
+  const p = mu / RESP / (PPM_M + GUARD);
+  return 10 * Math.log10(p * 1e3) + IMPL;
+}
+const infoBps = slotDiv => (Math.log2(PPM_M) / ((PPM_M + GUARD) * (slotDiv / F_SYS))) * FEC;
+
+/* Gaussian-beam link budget, all terms in dB */
+function budget(pTxDbm, thetaUrad, dKm, apM, lossDb, pointUrad) {
+  const th = thetaUrad * 1e-6, d = dKm * 1000;
+  const gTx = 10 * Math.log10(32 / (th * th));
+  const fspl = 10 * Math.log10(Math.pow(LAM / (4 * Math.PI * d), 2));
+  const gRx = 10 * Math.log10(Math.pow(Math.PI * apM / LAM, 2));
+  const pl = 10 * Math.log10(Math.exp(-8 * Math.pow(pointUrad * 1e-6, 2) / (th * th)));
+  return { pTxDbm, gTx, fspl, gRx, pl, loss: -lossDb, prx: pTxDbm + gTx + fspl + gRx + pl - lossDb };
+}
+
+/* end-to-end airtime for a frame of n bytes, in ms */
+function airtime(nBytes, slotDiv) {
+  const syms = Math.ceil(nBytes / 2) * 7;
+  const slots = (24 + 4 + syms) * (PPM_M + GUARD);
+  return slots * slotDiv / F_SYS * 1000;
+}
+
+/* ---- frame + PHY, mirroring rtl/nexus_defs.vh ---- */
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) { let c = i; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; t[i] = c >>> 0; }
+  return t;
+})();
+function crc32(bytes) {
+  let c = 0xFFFFFFFF;
+  for (const b of bytes) c = CRC_TABLE[(c ^ b) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+const hamEnc = d => {
+  const [d0, d1, d2, d3] = [d & 1, (d >> 1) & 1, (d >> 2) & 1, (d >> 3) & 1];
+  return (d3 << 6) | (d2 << 5) | (d1 << 4) | (d0 << 3) | ((d1 ^ d2 ^ d3) << 2) | ((d0 ^ d2 ^ d3) << 1) | (d0 ^ d1 ^ d3);
+};
+/* two bytes -> 7 interleaved 16-PPM symbols (4 bits each) */
+function encBlock(a, b) {
+  const c = [hamEnc(a & 15), hamEnc(a >> 4), hamEnc(b & 15), hamEnc(b >> 4)];
+  const out = [];
+  for (let j = 0; j < 7; j++) out.push(((c[3] >> j) & 1) << 3 | ((c[2] >> j) & 1) << 2 | ((c[1] >> j) & 1) << 1 | ((c[0] >> j) & 1));
+  return out;
+}
+function ppmSymbols(bytes) {
+  const syms = [];
+  for (let i = 0; i < bytes.length; i += 2) syms.push(...encBlock(bytes[i], bytes[i + 1] || 0));
+  return syms;
+}
+function buildFrame(src, dst, seq, payload, ttl, type) {
+  const enc = new TextEncoder().encode(payload);
+  const f = [0x10, type, ttl];
+  for (let i = 0; i < 8; i++) f.push((dst >> BigInt(56 - 8 * i)) & 0xFFn ? Number((dst >> BigInt(56 - 8 * i)) & 0xFFn) : 0);
+  for (let i = 0; i < 8; i++) f.push(Number((src >> BigInt(56 - 8 * i)) & 0xFFn));
+  f.push(seq >> 8, seq & 0xFF, ...enc);
+  const c = crc32(f);
+  f.push((c >>> 24) & 0xFF, (c >>> 16) & 0xFF, (c >>> 8) & 0xFF, c & 0xFF);
+  return Uint8Array.from(f);
+}
+
+if (typeof module !== 'undefined') module.exports = { rxSens, infoBps, budget, airtime, crc32, encBlock, ppmSymbols, buildFrame, F_SYS };
+
+
+const $ = id => document.getElementById(id);
+const SITES = {
+  rajkot:      {name:'Rajkot',      km:36354, el:63.6, ms:121.3},
+  leh:         {name:'Leh',         km:37071, el:50.1, ms:123.7},
+  kanyakumari: {name:'Kanyakumari', km:35875, el:79.6, ms:119.7},
+  itanagar:    {name:'Itanagar',    km:36978, el:51.6, ms:123.3},
+  portblair:   {name:'Port Blair',  km:36326, el:64.3, ms:121.2}
+};
+const POWERS = [{dbm:6,label:'4 mW'},{dbm:10,label:'10 mW'},{dbm:13,label:'20 mW'},{dbm:20,label:'100 mW'},{dbm:23,label:'200 mW'}];
+
+let S, anim = [], logEl, seq = 1, packets = [], running = true, faults = 0, battery = 0.92, busy = false;
+
+function log(cls, txt) {
+  const d = document.createElement('div');
+  const t = new Date().toLocaleTimeString('en-GB', {hour12:false});
+  d.className = 't' + cls;
+  d.textContent = `${t}  ${txt}`;
+  logEl.appendChild(d);
+  const near = logEl.scrollTop + logEl.clientHeight >= logEl.scrollHeight - 40;
+  while (logEl.children.length > 160) logEl.firstChild.remove();
+  if (near) logEl.scrollTop = logEl.scrollHeight;
+}
+
+function cfg() {
+  const mode = $('mode').value, site = SITES[$('site').value];
+  const p = POWERS[+$('pw').value];
+  const div = +$('div').value, pt = +$('pt').value, slotDiv = +$('slot').value;
+  const sun = $('sun').value === '1';
+  if (mode === 'roof') {
+    return {mode, slotDiv, div, pt, sun, p,
+      d1:0.3, d2:0.3, delay:0.001,
+      up:{pTx:p.dbm - 13.3, th:div, dKm:0.3, ap:0.1, loss:4.0},
+      dn:{pTx:p.dbm - 13.3, th:div, dKm:0.3, ap:0.1, loss:4.0}};
+  }
+  return {mode, slotDiv, div, pt, sun, p, site,
+    d1:site.km, d2:site.km, delay:site.ms,
+    up:{pTx:p.dbm, th:div, dKm:site.km, ap:0.1, loss:11.5},
+    dn:{pTx:30, th:Math.max(25, div), dKm:site.km, ap:0.1, loss:10.0}};
+}
+
+function evaluate() {
+  const c = cfg();
+  const sens = rxSens(-61.4, c.slotDiv);
+  const up = budget(c.up.pTx, c.up.th, c.up.dKm, c.up.ap, c.up.loss, c.pt);
+  const dn = budget(c.dn.pTx, c.dn.th, c.dn.dKm, c.dn.ap, c.dn.loss, c.pt);
+  return {c, sens, up, dn, mUp: up.prx - sens, mDn: dn.prx - sens};
+}
+
+/* probability a frame survives, from the margin */
+const pOk = m => m <= -3 ? 0.02 : m >= 6 ? 0.995 : 1 / (1 + Math.exp(-(m - 1) / 1.8));
+
+function renderBudget() {
+  const e = evaluate(), c = e.c;
+  const rows = (b, el) => {
+    const terms = [
+      ['Transmit power', b.pTxDbm], ['Transmit beam gain', b.gTx], ['Free-space loss', b.fspl],
+      ['Receive aperture gain', b.gRx], ['Pointing loss', b.pl], ['Optics, filter, atmosphere', b.loss]
+    ];
+    $(el).innerHTML = terms.map(([n, v]) => `<div class="term"><span>${n}</span><span class="${v < 0 ? 'neg' : ''}">${v.toFixed(1)} dB</span></div>`).join('')
+      ;
+  };
+  rows(e.up, 'upTerms'); rows(e.dn, 'dnTerms');
+  const fmt = v => v.toFixed(1) + ' dB';
+  $('upPrx').textContent = e.up.prx.toFixed(1) + ' dBm';
+  $('dnPrx').textContent = e.dn.prx.toFixed(1) + ' dBm';
+  $('upSens').textContent = e.sens.toFixed(1) + ' dBm';
+  $('dnSens').textContent = e.sens.toFixed(1) + ' dBm';
+  $('upMar').textContent = fmt(e.mUp); $('upMar').style.color = e.mUp < 0 ? 'var(--bad)' : e.mUp < 3 ? 'var(--amber)' : 'var(--ok)';
+  $('dnMar').textContent = fmt(e.mDn); $('dnMar').style.color = e.mDn < 0 ? 'var(--bad)' : e.mDn < 3 ? 'var(--amber)' : 'var(--ok)';
+  const okUp = e.mUp > 0, okDn = e.mDn > 0;
+  $('cUp').className = 'chip ' + (okUp ? (e.mUp > 3 ? 'good' : '') : 'bad');
+  $('cDown').className = 'chip ' + (okDn ? (e.mDn > 3 ? 'good' : '') : 'bad');
+  $('cUp').innerHTML = `Uplink <b>${okUp ? e.mUp.toFixed(1) + ' dB' : 'closed'}</b>`;
+  $('cDown').innerHTML = `Downlink <b>${okDn ? e.mDn.toFixed(1) + ' dB' : 'closed'}</b>`;
+  $('cLat').textContent = (c.delay * 2).toFixed(c.mode === 'geo' ? 0 : 3) + (c.mode === 'geo' ? ' ms' : ' ms');
+  $('cAir').textContent = airtime(30, c.slotDiv).toFixed(2) + ' ms · ' + (infoBps(c.slotDiv) / 1000).toFixed(1) + ' kbit/s';
+  $('aPw').textContent = c.p.label + ' · ' + (c.mode === 'roof' ? (c.p.dbm - 13.3).toFixed(1) : c.p.dbm) + ' dBm';
+}
+
+/* ---------------- scene ---------------- */
+const cv = $('scene'), ctx = cv.getContext('2d');
+function fit() {
+  const r = cv.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+  cv.width = r.width * dpr; cv.height = r.height * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+function draw(t) {
+  const W = cv.width / (Math.min(devicePixelRatio || 1, 2)), H = cv.height / (Math.min(devicePixelRatio || 1, 2));
+  const e = evaluate(), c = e.c;
+  ctx.clearRect(0, 0, W, H);
+
+  // sky gradient
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, css('--sky')); g.addColorStop(1, css('--earth'));
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+  const ax = W * 0.14, bx = W * 0.86, gy = H * 0.82;
+  const satX = W * 0.5, satY = c.mode === 'geo' ? H * 0.13 : H * 0.42;
+
+  // earth curve
+  ctx.beginPath();
+  ctx.arc(W / 2, H * 2.6, H * 2.05, Math.PI * 1.28, Math.PI * 1.72);
+  ctx.strokeStyle = css('--mute'); ctx.lineWidth = 1.2; ctx.globalAlpha = .5; ctx.stroke(); ctx.globalAlpha = 1;
+
+  // beams
+  const beam = (x1, y1, x2, y2, ok, m) => {
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+    ctx.strokeStyle = ok ? css('--beam') : css('--mute');
+    ctx.globalAlpha = ok ? .75 : .35; ctx.lineWidth = ok ? 1.8 : 1.2;
+    ctx.setLineDash(ok ? [] : [5, 6]); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+  };
+  beam(ax, gy - 26, satX, satY + 16, e.mUp > 0, e.mUp);
+  beam(satX, satY + 16, bx, gy - 26, e.mDn > 0, e.mDn);
+
+  // satellite
+  ctx.save(); ctx.translate(satX, satY);
+  ctx.fillStyle = css('--panel'); ctx.strokeStyle = css('--ink'); ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.roundRect(-34, -13, 68, 26, 5); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = css('--teal'); ctx.globalAlpha = .35;
+  ctx.fillRect(-58, -8, 20, 16); ctx.fillRect(38, -8, 20, 16); ctx.globalAlpha = 1;
+  ctx.beginPath(); ctx.moveTo(0, -13); ctx.lineTo(0, -24); ctx.stroke();
+  ctx.beginPath(); ctx.arc(0, -27, 3.5, 0, 7); ctx.fillStyle = css('--beam'); ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = css('--mute'); ctx.font = '11px "IBM Plex Mono", monospace'; ctx.textAlign = 'left';
+  ctx.fillText(c.mode === 'geo' ? 'GEO relay · ' + c.site.name : 'rooftop relay · 300 m', satX + 74, satY + 4);
+
+  // ground modules
+  const node = (x, y, label, sub, on) => {
+    ctx.save(); ctx.translate(x, y);
+    ctx.fillStyle = css('--panel'); ctx.strokeStyle = on ? css('--ink') : css('--mute'); ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.roundRect(-46, -26, 92, 52, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = on ? css('--beam') : css('--mute');
+    ctx.beginPath(); ctx.arc(0, -14, 3, 0, 7); ctx.fill();
+    ctx.fillStyle = css('--ink'); ctx.font = '600 12px "IBM Plex Sans", sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(label, 0, 6);
+    ctx.fillStyle = css('--mute'); ctx.font = '10px "IBM Plex Mono", monospace';
+    ctx.fillText(sub, 0, 20);
+    ctx.restore();
+  };
+  node(ax, gy, 'Module A', 'queue ' + S.queue.length, true);
+  node(bx, gy, 'Module B', 'delivered ' + S.delivered, e.mDn > 0);
+
+  // packets in flight
+  for (const p of packets) {
+    const k = Math.min(1, (t - p.t0) / p.dur);
+    if (k < 0) continue;
+    const x = p.x1 + (p.x2 - p.x1) * k, y = p.y1 + (p.y2 - p.y1) * k;
+    ctx.beginPath(); ctx.arc(x, y, 4.5, 0, 7);
+    ctx.fillStyle = p.col; ctx.globalAlpha = k > 1 ? 0 : 1; ctx.fill(); ctx.globalAlpha = 1;
+  }
+  packets = packets.filter(p => t - p.t0 < p.dur);
+  requestAnimationFrame(draw);
+}
+
+function fly(x1, y1, x2, y2, dur, col) {
+  const c = cfg();
+  const ax = cv.width / dpr() * 0.14, bx = cv.width / dpr() * 0.86, gy = cv.height / dpr() * 0.82;
+  const satX = cv.width / dpr() * 0.5, satY = (c.mode === 'geo' ? cv.height / dpr() * 0.13 : cv.height / dpr() * 0.42);
+  const map = {A: [ax, gy - 26], S: [satX, satY + 16], B: [bx, gy - 26]};
+  packets.push({x1: map[x1][0], y1: map[x1][1], x2: map[x2][0], y2: map[x2][1], t0: performance.now(), dur, col});
+  return new Promise(r => setTimeout(r, dur));
+}
+const dpr = () => Math.min(devicePixelRatio || 1, 2);
+
+/* ---------------- PPM scope ---------------- */
+const sc = $('scope'), sctx = sc.getContext('2d');
+let lastSyms = [0, 0, 0, 15, 15, 9, 6, 3, 12, 7, 1, 14], lastBad = -1;
+function drawScope() {
+  const r = sc.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2);
+  sc.width = r.width * d; sc.height = r.height * d;
+  sctx.setTransform(d, 0, 0, d, 0, 0);
+  const W = r.width, H = r.height, pad = 10;
+  sctx.clearRect(0, 0, W, H);
+  const syms = lastSyms, n = syms.length, sw = (W - pad * 2) / n;
+  for (let i = 0; i < n; i++) {
+    const x0 = pad + i * sw;
+    for (let s = 0; s < 20; s++) {
+      const x = x0 + s * sw / 20, w = sw / 20 - 1;
+      const guard = s >= 16;
+      sctx.fillStyle = guard ? 'rgba(128,128,128,.12)' : 'rgba(128,128,128,.05)';
+      sctx.fillRect(x, pad, Math.max(w, 1), H - pad * 2 - 14);
+      if (s === syms[i]) {
+        sctx.fillStyle = (i === lastBad) ? css('--bad') : css('--beam');
+        sctx.fillRect(x, pad + 6, Math.max(w, 1.5), H - pad * 2 - 26);
+      }
+    }
+    sctx.fillStyle = css('--mute'); sctx.font = '9px "IBM Plex Mono", monospace'; sctx.textAlign = 'center';
+    sctx.fillText(i < 4 ? 'PRE' : i < 8 ? 'SFD' : String(i - 8), x0 + sw / 2, H - 4);
+  }
+}
+
+/* ---------------- frame flow ---------------- */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const nodeName = () => cfg().mode === 'geo' ? 'SAT' : 'RLY';
+
+async function transmit(payload, type, ttl, tries) {
+  const e = evaluate(), c = e.c;
+  const frame = buildFrame(0x4E00000000000001n, 0x4E00000000000002n, seq++, payload, ttl, type);
+  const syms = ppmSymbols(frame.slice(0, 12));
+  lastSyms = [0,0,0,0, 15,15,9,6, ...syms.slice(0, 8)];
+  lastBad = faults > 0 ? 8 : -1;
+  drawScope();
+  log('A', `TX ${type === 1 ? 'DATA' : type === 4 ? 'HELLO' : 'SOS'} seq=${frame.length}B ttl=${ttl} air=${airtime(frame.length, c.slotDiv).toFixed(2)} ms`);
+
+  if (battery < 0.04) { log('E', 'relay offline: battery empty, frame queued'); return false; }
+  if (faults >= 2) {
+    log('S', `RX ${frame.length}B — 2 bad pulses in one block, Hamming cannot fix it, CRC fails`);
+    log('E', `NACK CRC from ${nodeName()} → retry ${tries}/4`);
+    S.dropped++; faults = 0; update();
+    return false;
+  }
+  if (faults === 1) { log('S', `RX — 1 bad pulse, Hamming(7,4) corrected 3 bits, CRC ok`); S.fec += 3; }
+  faults = 0;
+
+  if (Math.random() > pOk(e.mUp)) {
+    log('E', `uplink lost: received ${e.up.prx.toFixed(1)} dBm against ${e.sens.toFixed(1)} dBm sensitivity`);
+    return false;
+  }
+  await fly('A', 0, 'S', 0, 320, css('--beam'));
+  log('S', `RX ok, CRC-32 pass, TTL ${ttl} → ${ttl - 1}`);
+  S.buf = 'holding'; update();
+  await sleep(120);
+  S.buf = 'wiped ✓'; S.fwd++; update();
+  log('S', 'transit buffer wiped to zero, read back all-zero (STATUS bit 7)');
+
+  if (Math.random() > pOk(e.mDn)) {
+    log('E', `downlink lost: received ${e.dn.prx.toFixed(1)} dBm against ${e.sens.toFixed(1)} dBm sensitivity`);
+    return false;
+  }
+  await fly('S', 0, 'B', 0, 320, css('--beam'));
+  S.delivered++;
+  log('B', `RX ok, CRC pass, "${payload}"`);
+  $('bMsg').textContent = payload.length > 18 ? payload.slice(0, 17) + '…' : payload;
+  $('bRssi').textContent = e.dn.prx.toFixed(1) + ' dBm';
+  await fly('B', 0, 'S', 0, 220, css('--ok'));
+  await fly('S', 0, 'A', 0, 220, css('--ok'));
+  log('A', `ACK received for seq ${seq - 1} ✓`);
+  $('aAck').textContent = 'seq ' + (seq - 1);
+  update();
+  return true;
+}
+
+async function send(payload, type, ttl) {
+  if (busy) { S.queue.push({payload, type, ttl}); update(); return; }
+  busy = true;
+  $('aSt').textContent = 'transmitting';
+  let ok = false;
+  for (let i = 1; i <= 4 && !ok; i++) {
+    ok = await transmit(payload, type, ttl, i);
+    if (!ok && i < 4) { $('aRet').textContent = i; log('A', `retry ${i + 1}/4 in ${i * 400} ms`); await sleep(i * 400); }
+  }
+  if (!ok) { log('A', 'queued for later — store and forward keeps it until the link opens'); S.queue.push({payload, type, ttl}); }
+  busy = false;
+  $('aSt').textContent = ok ? 'idle' : 'queued';
+  update();
+  flush();
+}
+
+async function flush() {
+  if (busy || !S.queue.length) return;
+  const e = evaluate();
+  if (e.mUp <= 0 || e.mDn <= 0) return;
+  const m = S.queue.shift(); update();
+  log('A', `queue flush: ${S.queue.length} left`);
+  await send(m.payload, m.type, m.ttl);
+}
+
+function update() {
+  $('aQ').textContent = S.queue.length;
+  $('sBuf').textContent = S.buf;
+  $('sFec').textContent = S.fec + ' bits';
+  $('sFwd').textContent = S.fwd;
+  $('sDrp').textContent = S.dropped;
+  $('bRx').textContent = S.delivered;
+  $('bCrc').textContent = S.dropped;
+  $('sBat').textContent = (11.2 + 1.6 * battery).toFixed(2) + ' V · ' + (battery * 100).toFixed(0) + '%';
+  $('sLoad').textContent = (busy ? 1.16 : 1.07).toFixed(2) + ' W';
+  $('soc').style.width = (battery * 100) + '%';
+  $('soc').style.background = battery < 0.2 ? 'var(--bad)' : 'var(--ok)';
+  const e = evaluate();
+  $('cNode').className = 'chip ' + (battery > 0.04 ? 'good' : 'bad');
+  $('cNode').innerHTML = `Relay <b>${battery > 0.04 ? 'online' : 'offline'}</b>`;
+}
+
+/* ---------------- controls ---------------- */
+['mode','site','pw','div','pt','slot','sun'].forEach(id => {
+  $(id).addEventListener('input', () => {
+    renderBudget(); update();
+    if (id === 'mode' || id === 'site') log('N', `${cfg().mode === 'geo' ? 'GEO' : 'rooftop'} scenario · ${evaluate().c.mode === 'geo' ? evaluate().c.site.name : '300 m'} · one-way ${evaluate().c.delay} ms`);
+  });
+});
+$('pw').addEventListener('input', () => { $('oPw').textContent = POWERS[+$('pw').value].label; });
+$('div').addEventListener('input', () => { $('oDiv').textContent = $('div').value + ' µrad'; });
+$('pt').addEventListener('input', () => { $('oPt').textContent = $('pt').value + ' µrad'; });
+$('send').addEventListener('click', () => { const t = $('msg').value.trim(); if (t) send(t, 1, 3); });
+$('msg').addEventListener('keydown', e => { if (e.key === 'Enter') $('send').click(); });
+$('sos').addEventListener('click', () => send('SOS 22.30N 70.80E', 4, 5));
+$('fault1').addEventListener('click', () => { faults = 1; log('N', 'bench fault: one PPM pulse displaced by one slot'); });
+$('fault2').addEventListener('click', () => { faults = 2; log('N', 'bench fault: two PPM pulses displaced in the same block'); });
+
+/* ---------------- power + loop ---------------- */
+setInterval(() => {
+  const sun = $('sun').value === '1';
+  const load = (busy ? 1.16 : 1.07);
+  const panel = sun ? 20 * 0.17 : 0;          // 82 Wh/day ≈ 3.4 W average on a clear day
+  const net = (panel - load) / 76.8 / 3600;    // 6 Ah × 12.8 V pack, per second
+  battery = Math.max(0, Math.min(1, battery + net * 600));
+  if (battery < 0.04 && $('sSt').textContent !== 'offline') { $('sSt').textContent = 'offline'; log('E', 'relay brownout: battery below 4 %, node offline'); }
+  if (battery > 0.1 && $('sSt').textContent === 'offline') { $('sSt').textContent = 'idle'; log('S', 'relay recovered above 10 %, rebooting'); }
+  update();
+}, 1000);
+setInterval(() => { if (!busy) flush(); }, 6000);
+
+/* boot */
+logEl = $('log');
+S = {queue: [], delivered: 0, fec: 0, fwd: 0, dropped: 0, buf: 'wiped'};
+$('oPw').textContent = POWERS[4].label;
+$('oDiv').textContent = $('div').value + ' µrad';
+$('oPt').textContent = $('pt').value + ' µrad';
+fit(); drawScope(); renderBudget(); update();
+log('N', 'bench started · relay beacon every 12 s · SLOT_DIV 36');
+log('S', 'transit buffer wiped to zero, route table 0 entries');
+addEventListener('resize', () => { fit(); drawScope(); });
+requestAnimationFrame(draw);
+</script>
+</body></html>
